@@ -2075,5 +2075,178 @@
         // Запуск
         initPage();
     </script>
+
+    <!-- ===== ПОДКЛЮЧЕНИЕ SUPABASE ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+        <!-- ===== ПОДКЛЮЧЕНИЕ SUPABASE ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+    // ✅ Инициализация Supabase - ИСПРАВЛЕНО
+    // ⚠️ ВАЖНО: ВСТАВЬТЕ СВОИ ДАННЫЕ ИЗ SUPABASE!
+    const SUPABASE_URL = 'https://ifodnbfkxucvurjsuwww.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ'; // Вставьте полный ключ!
+    
+    // Создаем клиент с другим именем, чтобы избежать конфликта
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Загрузка данных из Supabase
+    async function loadFromSupabase() {
+        try {
+            console.log('☁️ Загружаем данные из Supabase...');
+            
+            // Загружаем рефереров
+            const { data: referrers, error: refError } = await supabaseClient
+                .from('referrers')
+                .select('*');
+            
+            if (refError) throw refError;
+            
+            if (referrers && referrers.length > 0) {
+                data.referrers = referrers.map(r => ({
+                    name: r.name,
+                    password: r.password,
+                    paidBonus: r.paid_bonus || 0,
+                    id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
+                }));
+                console.log(`✅ Загружено ${referrers.length} рефереров`);
+            }
+            
+            // Загружаем клиентов
+            const { data: clients, error: clientsError } = await supabaseClient
+                .from('clients')
+                .select('*');
+            
+            if (clientsError) throw clientsError;
+            
+            if (clients && clients.length > 0) {
+                data.clients = clients.map(c => ({
+                    name: c.name,
+                    password: c.password,
+                    workHistory: c.work_history || [],
+                    referrerId: c.referrer_id,
+                    paidFull: (c.work_history || []).filter(w => !w.isDiscounted).length
+                }));
+                console.log(`✅ Загружено ${clients.length} клиентов`);
+            }
+            
+            // Если база пустая, создаем тестовые данные
+            if (!clients?.length && !referrers?.length) {
+                await createTestData();
+            }
+            
+            // Обновляем интерфейс
+            updateUserSelect();
+            renderClientsTable();
+            renderReferrersTable();
+            updateSummaryStats();
+            
+            showNotification('☁️ Данные загружены из облака', 'success');
+            
+        } catch (err) {
+            console.error('❌ Ошибка загрузки из Supabase:', err);
+            showNotification('Ошибка загрузки из облака', 'error');
+        }
+    }
+    
+    // Создание тестовых данных
+    async function createTestData() {
+        try {
+            console.log('📝 Создаем тестовые данные...');
+            
+            // Тестовые рефереры
+            const testReferrers = [
+                { name: 'Сергей Петров', password: 'ref123', paid_bonus: 0 },
+                { name: 'Анна Сидорова', password: 'ref456', paid_bonus: 0 }
+            ];
+            
+            for (const ref of testReferrers) {
+                const { error } = await supabaseClient
+                    .from('referrers')
+                    .insert([ref]);
+                if (error) console.error('Ошибка создания реферера:', error);
+            }
+            
+            // Тестовые клиенты
+            const testClients = [
+                { name: 'Иван Петров', password: 'client123', work_history: [], referrer_id: null },
+                { name: 'Мария Сидорова', password: 'client456', work_history: [], referrer_id: null }
+            ];
+            
+            for (const client of testClients) {
+                const { error } = await supabaseClient
+                    .from('clients')
+                    .insert([client]);
+                if (error) console.error('Ошибка создания клиента:', error);
+            }
+            
+            console.log('✅ Тестовые данные созданы');
+            await loadFromSupabase(); // Перезагружаем
+            
+        } catch (err) {
+            console.error('Ошибка создания тестовых данных:', err);
+        }
+    }
+    
+    // Сохранение данных в Supabase
+    async function saveToSupabase() {
+        try {
+            console.log('☁️ Сохраняем данные в Supabase...');
+            
+            // Сохраняем рефереров
+            for (const referrer of data.referrers) {
+                const { error } = await supabaseClient
+                    .from('referrers')
+                    .upsert({
+                        name: referrer.name,
+                        password: referrer.password,
+                        paid_bonus: referrer.paidBonus || 0
+                    }, { onConflict: 'name' });
+                
+                if (error) console.error('Ошибка сохранения реферера:', error);
+            }
+            
+            // Сохраняем клиентов
+            for (const client of data.clients) {
+                const { error } = await supabaseClient
+                    .from('clients')
+                    .upsert({
+                        name: client.name,
+                        password: client.password,
+                        work_history: client.workHistory || [],
+                        referrer_id: client.referrerId
+                    }, { onConflict: 'name' });
+                
+                if (error) console.error('Ошибка сохранения клиента:', error);
+            }
+            
+            console.log('✅ Данные сохранены в Supabase');
+            
+        } catch (err) {
+            console.error('❌ Ошибка сохранения в Supabase:', err);
+        }
+    }
+    
+    // Переопределяем функцию saveData для сохранения в облако
+    const originalSaveData = window.saveData;
+    if (originalSaveData) {
+        window.saveData = function() {
+            originalSaveData(); // Сохраняем локально
+            saveToSupabase();   // Сохраняем в облако (асинхронно)
+        };
+    }
+    
+    // Загружаем данные при старте
+    document.addEventListener('DOMContentLoaded', function() {
+        // Загружаем из Supabase перед инициализацией
+        loadFromSupabase().then(() => {
+            // Запускаем оригинальную инициализацию
+            if (typeof window.initPage === 'function') {
+                window.initPage();
+            }
+        });
+    });
+    </script>
 </body>
 </html>

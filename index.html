@@ -23,7 +23,6 @@
             --gray-light: #f8f9fa;
             --border: #eaeaea;
             --shadow: 0 10px 40px rgba(0,0,0,0.1);
-            --shadow-hover: 0 15px 50px rgba(0,0,0,0.15);
             --radius: 16px;
             --radius-sm: 12px;
         }
@@ -47,18 +46,7 @@
             position: relative;
         }
 
-        /* Анимированный фон */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
-            pointer-events: none;
-        }
+        /* Убираем анимированный фон */
 
         .container {
             max-width: 1600px;
@@ -66,16 +54,12 @@
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             overflow: hidden;
-            transition: all 0.3s ease;
             position: relative;
             z-index: 1;
-        }
-
-        .container:hover {
-            box-shadow: var(--shadow-hover);
         }
 
         /* ===== ШАПКА ===== */
@@ -85,16 +69,6 @@
             padding: 24px 32px;
             position: relative;
             overflow: hidden;
-        }
-
-        .header::before {
-            content: '⚡';
-            position: absolute;
-            right: -20px;
-            bottom: -20px;
-            font-size: 120px;
-            opacity: 0.1;
-            transform: rotate(15deg);
         }
 
         h1 {
@@ -109,7 +83,6 @@
 
         h1 span {
             font-size: 2rem;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
         }
 
         .subtitle {
@@ -140,17 +113,10 @@
             cursor: pointer;
             font-weight: 600;
             color: var(--gray);
-            transition: all 0.2s ease;
             font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .tab:hover {
-            background: #e9ecef;
-            color: var(--dark);
-            transform: translateY(-2px);
         }
 
         .tab.active {
@@ -158,18 +124,6 @@
             color: var(--info);
             border-color: var(--info) var(--info) transparent var(--info);
             margin-bottom: -2px;
-            position: relative;
-            box-shadow: 0 -4px 10px rgba(52, 152, 219, 0.1);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: white;
         }
 
         /* ===== АВТОРИЗАЦИЯ ===== */
@@ -184,15 +138,11 @@
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 40px;
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        .auth-panel-simple:hover {
-            transform: translateY(-5px);
         }
 
         .auth-title {
@@ -209,7 +159,9 @@
         .auth-title span {
             background: linear-gradient(145deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent; /* fallback */
             font-size: 2rem;
         }
 
@@ -225,20 +177,14 @@
             border-radius: 16px;
             font-size: 16px;
             background: white;
-            transition: all 0.2s ease;
             -webkit-appearance: none;
-            margin-bottom: 20px;
-            
+            appearance: none;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-control:hover {
-            border-color: var(--secondary);
         }
 
         /* ===== КНОПКИ ===== */
@@ -253,15 +199,12 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.2s ease;
             background: white;
             color: var(--dark);
             border: 2px solid transparent;
             -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn:active {
-            transform: scale(0.97);
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .btn-primary {
@@ -271,19 +214,9 @@
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
-            transform: translateY(-2px);
-        }
-
         .btn-secondary {
             background: var(--gray);
             color: white;
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray);
-            opacity: 0.9;
         }
 
         .btn-success {
@@ -315,7 +248,6 @@
             align-items: center;
             gap: 12px;
             border-bottom: 1px solid var(--border);
-            transition: all 0.3s ease;
         }
 
         .view-mode {
@@ -350,23 +282,6 @@
             max-height: 600px;
             overflow-y: auto;
             background: white;
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) var(--gray-light);
-        }
-
-        .table-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        .table-container::-webkit-scrollbar-track {
-            background: var(--gray-light);
-            border-radius: 10px;
-        }
-
-        .table-container::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
         }
 
         table {
@@ -398,11 +313,6 @@
 
         tbody tr {
             border-bottom: 1px solid var(--border);
-            transition: background 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background-color: #fafbfc;
         }
 
         td {
@@ -433,11 +343,6 @@
             border-radius: 12px;
             padding: 12px 15px;
             min-width: 100px;
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: scale(1.02);
         }
 
         .stat-value {
@@ -522,7 +427,6 @@
             height: 100%;
             background: linear-gradient(90deg, var(--info), var(--success));
             border-radius: 10px;
-            transition: width 0.3s ease;
         }
 
         /* ===== ДЕЙСТВИЯ ===== */
@@ -544,17 +448,9 @@
             gap: 6px;
             min-width: 90px;
             justify-content: center;
-            transition: all 0.2s ease;
             background: white;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .action-btn:active {
-            transform: translateY(0);
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .action-add {
@@ -606,6 +502,7 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -622,18 +519,6 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
-            animation: modalAppear 0.3s ease;
-        }
-
-        @keyframes modalAppear {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
         }
 
         .modal-title {
@@ -643,7 +528,9 @@
             margin-bottom: 25px;
             background: linear-gradient(145deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
         }
 
         .modal-actions {
@@ -668,30 +555,8 @@
             min-width: 300px;
             max-width: 400px;
             backdrop-filter: blur(10px);
-            animation: slideInRight 0.3s ease;
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
         }
 
         .notification-success {
@@ -721,31 +586,13 @@
             font-weight: 600;
             display: none;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
-            }
-            50% {
-                box-shadow: 0 10px 40px rgba(52, 152, 219, 0.6);
-            }
-            100% {
-                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
-            }
         }
 
         .loading-indicator span {
             display: inline-block;
-            animation: spin 1s linear infinite;
             margin-right: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* ===== БЕЙДЖИ ===== */
@@ -811,11 +658,6 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
-        }
-
-        .summary-stat:hover {
-            transform: translateY(-5px);
         }
 
         .summary-value {
@@ -836,6 +678,51 @@
 
         .hidden {
             display: none !important;
+        }
+
+        .admin-hint {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-align: center;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .auth-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-align: center;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .auth-note code {
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .user-selector {
+            margin-bottom: 20px;
+        }
+
+        .user-selector select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            background: white;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         /* ===== АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ ===== */
@@ -884,7 +771,7 @@
 
             .form-control {
                 padding: 14px 16px;
-                font-size: 16px; /* Предотвращает зум на iOS */
+                font-size: 16px;
             }
 
             .btn {
@@ -963,15 +850,10 @@
             }
         }
 
-        /* Для очень маленьких экранов */
         @media (max-width: 380px) {
             .tab {
                 padding: 8px 12px;
                 font-size: 0.8rem;
-            }
-
-            .tab span {
-                display: none; /* Прячем иконки на очень маленьких экранах */
             }
 
             .summary-stat {
@@ -985,11 +867,6 @@
             .stat-value {
                 font-size: 1.2rem;
             }
-        }
-
-        /* Темная тема (опционально, если система поддерживает) */
-        @media (prefers-color-scheme: dark) {
-            /* Можно добавить темную тему позже */
         }
     </style>
 </head>
@@ -1569,13 +1446,11 @@
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.textContent = message;
-            notification.style.animation = 'slideInRight 0.3s ease';
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
+                notification.remove();
             }, 3000);
         }
 

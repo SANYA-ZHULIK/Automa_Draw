@@ -1407,85 +1407,153 @@
             };
         }
 
-        function applyDiscount(clientIndex) {
-            if (!currentUser || currentUser.type !== 'admin') return;
-            
-            const client = data.clients[clientIndex];
-            const workHistory = client.workHistory || [];
-            
-            const stats = calculateClientStats(client);
-            if (!stats.isDiscountAvailable) {
-                showNotification(`Скидка еще не доступна. Нужно ${DISCOUNT_CYCLE} оплаченных работ подряд.`, 'error');
-                return;
-            }
-            
-            const discountWork = {
-                date: new Date().toISOString(),
-                price: AVG_PRICE / 2,
-                bonusApplied: false,
-                isDiscounted: true
-            };
-            
-            workHistory.push(discountWork);
-            client.paidFull = workHistory.filter(w => !w.isDiscounted).length;
-            
-            // Сохраняем в Supabase
-            saveToSupabase();
-            
-            showNotification(`Скидка 50% применена к новой работе!`, 'success');
-            
-            renderClientsTable();
-            renderReferrersTable();
-            updateSummaryStats();
+        // ИСПРАВЛЕННАЯ функция применения скидки с сохранением в Supabase
+async function applyDiscount(clientIndex) {
+    if (!currentUser || currentUser.type !== 'admin') return;
+    
+    const client = data.clients[clientIndex];
+    const workHistory = client.workHistory || [];
+    
+    const stats = calculateClientStats(client);
+    if (!stats.isDiscountAvailable) {
+        showNotification(`Скидка еще не доступна. Нужно ${DISCOUNT_CYCLE} оплаченных работ подряд.`, 'error');
+        return;
+    }
+    
+    // Создаем новую скидочную работу
+    const discountWork = {
+        date: new Date().toISOString(),
+        price: AVG_PRICE / 2,
+        bonusApplied: false,
+        isDiscounted: true
+    };
+    
+    showLoading();
+    
+    try {
+        // Добавляем работу в историю
+        workHistory.push(discountWork);
+        client.paidFull = workHistory.filter(w => !w.isDiscounted).length;
+        
+        // Сохраняем в Supabase
+        const { error } = await supabaseClient
+            .from('clients')
+            .update({
+                work_history: workHistory
+            })
+            .eq('name', client.name);
+        
+        if (error) throw error;
+        
+        showNotification(`Скидка 50% применена к новой работе!`, 'success');
+        
+        // Обновляем интерфейс
+        renderClientsTable();
+        renderReferrersTable();
+        updateSummaryStats();
+        
+    } catch (err) {
+        console.error('Ошибка при применении скидки:', err);
+        showNotification('Ошибка при сохранении скидки', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+        // ИСПРАВЛЕННАЯ функция добавления работы с сохранением в Supabase
+async function confirmAddWork() {
+    if (!currentUser || currentUser.type !== 'admin' || selectedClientIndex === null) return;
+    
+    const client = data.clients[selectedClientIndex];
+    const price = parseFloat(workPrice.value) || AVG_PRICE;
+    
+    // Проверяем, доступна ли скидка
+    const stats = calculateClientStats(client);
+    
+    // Если скидка доступна, не даем добавить обычную работу
+    if (stats.isDiscountAvailable) {
+        showNotification('Сначала примените скидку! У клиента доступна скидка 50%.', 'error');
+        closeWorkModal();
+        return;
+    }
+    
+    let applyBonusChecked = false;
+    let referrer = null;
+    if (client.referrerId) {
+        referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
+        if (referrer) {
+            applyBonusChecked = applyBonus.checked;
         }
-
-        function confirmAddWork() {
-            if (!currentUser || currentUser.type !== 'admin' || selectedClientIndex === null) return;
-            
-            const client = data.clients[selectedClientIndex];
-            const price = parseFloat(workPrice.value) || AVG_PRICE;
-            
-            const stats = calculateClientStats(client);
-            
-            if (stats.isDiscountAvailable) {
-                showNotification('Сначала примените скидку! У клиента доступна скидка 50%.', 'error');
-                closeWorkModal();
-                return;
-            }
-            
-            let applyBonusChecked = false;
-            if (client.referrerId) {
-                const referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
-                if (referrer) {
-                    applyBonusChecked = applyBonus.checked;
-                }
-            }
-            
-            const workEntry = {
-                date: new Date().toISOString(),
-                price: price,
-                bonusApplied: applyBonusChecked,
-                isDiscounted: false
-            };
-            
-            if (!client.workHistory) {
-                client.workHistory = [];
-            }
-            
-            client.workHistory.push(workEntry);
-            client.paidFull = client.workHistory.filter(w => !w.isDiscounted).length;
-            
-            // Сохраняем в Supabase
-            saveToSupabase();
-            
-            renderClientsTable();
-            renderReferrersTable();
-            updateSummaryStats();
-            
-            closeWorkModal();
-            
-            showNotification(`Работа добавлена для ${client.name}`, 'success');
+    }
+    
+    // Создаем запись о работе
+    const workEntry = {
+        date: new Date().toISOString(),
+        price: price,
+        bonusApplied: applyBonusChecked,
+        isDiscounted: false
+    };
+    
+    showLoading();
+    
+    try {
+        // Добавляем работу в историю клиента
+        if (!client.workHistory) {
+            client.workHistory = [];
         }
+        
+        client.workHistory.push(workEntry);
+        client.paidFull = client.workHistory.filter(w => !w.isDiscounted).length;
+        
+        // Сохраняем обновленного клиента в Supabase
+        const { error: clientError } = await supabaseClient
+            .from('clients')
+            .update({
+                work_history: client.workHistory
+            })
+            .eq('name', client.name);
+        
+        if (clientError) throw clientError;
+        
+        // Если нужно начислить бонус рефереру - просто показываем уведомление
+        // Бонусы начисляются автоматически при расчете статистики
+        if (client.referrerId && applyBonusChecked && referrer) {
+            const bonus = price * (REFERRAL_BONUS_PERCENT / 100);
+            showNotification(`Рефереру ${referrer.name} начислен бонус ${bonus.toFixed(2)} BYN`, 'success');
+        }
+        
+        // Обновляем интерфейс
+        renderClientsTable();
+        renderReferrersTable();
+        updateSummaryStats();
+        
+        closeWorkModal();
+        
+        showNotification(`Работа добавлена для ${client.name}`, 'success');
+        
+    } catch (err) {
+        console.error('Ошибка при добавлении работы:', err);
+        showNotification('Ошибка при сохранении работы', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+// Вспомогательная функция для обновления клиента в Supabase
+async function updateClientInSupabase(client) {
+    try {
+        const { error } = await supabaseClient
+            .from('clients')
+            .update({
+                work_history: client.workHistory || []
+            })
+            .eq('name', client.name);
+        
+        if (error) throw error;
+        return true;
+    } catch (err) {
+        console.error('Ошибка обновления клиента:', err);
+        return false;
+    }
+}
 
         function calculateClientBonus(client) {
             if (!client.referrerId) return 0;

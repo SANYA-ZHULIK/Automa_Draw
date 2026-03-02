@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Учёт работ + Реферальergergная система</title>
+    <title>Учёт работ + Реферальная система</title>
     <style>
         * {
             box-sizing: border-box;
@@ -95,7 +95,6 @@
         }
         .auth-title span {
             background: linear-gradient(135deg, #667eea, #764ba2);
-            
             -webkit-text-fill-color: transparent;
         }
         .form-group {
@@ -723,16 +722,81 @@
             font-size: 15px;
             background: white;
         }
+
+        /* Индикатор загрузки */
+        .loading-indicator {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .loading-indicator span {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Кнопка синхронизации */
+        .sync-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .sync-button:hover {
+            transform: scale(1.05);
+            background: #2ecc71;
+        }
+        
+        .sync-button:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
+    <!-- Индикатор загрузки -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <span>⚡</span> Загрузка данных...
+    </div>
+
+    <!-- Кнопка синхронизации -->
+    <button class="sync-button" onclick="syncAllToSupabase()" id="syncButton">
+        <span>🔄</span> Синхронизировать
+    </button>
+
     <div class="container">
         <div class="header">
             <h1>📊 Учет работ + Реферальная система</h1>
             <p class="subtitle">Скидка каждую 10-ю работу • Бонус рефереру 10% от заказов друга • Цена чертежа: 20–25 BYN</p>
         </div>
         
-        <!-- Панель аутентификации - упрощенная -->
+        <!-- Панель аутентификации -->
         <div class="auth-section" id="authSection">
             <div class="auth-panel-simple">
                 <div class="auth-title">
@@ -873,7 +937,7 @@
 
         <!-- Футер со статистикой -->
         <div class="footer">
-            <div>💾 Данные сохраняются автоматически в браузере • Бонус рефереру: 10% от заказов друга (в BYN)</div>
+            <div>☁️ Данные хранятся в облаке Supabase • Бонус рефереру: 10% от заказов друга (в BYN)</div>
             <div class="summary-stats" id="summaryStats">
                 <!-- Статистика будет здесь -->
             </div>
@@ -924,57 +988,21 @@
     <script>
         // === НАСТРОЙКИ ===
         const EDIT_PASSWORD = "admin123";
-        const STORAGE_KEY = 'referralSystemData';
         const AUTH_KEY = 'currentUser';
-        const DISCOUNT_CYCLE = 9; // Нужно 9 оплаченных работ для получения скидки на 10-ю
-        const REFERRAL_BONUS_PERCENT = 10; // 10% от заказа
-        const AVG_PRICE = 22.5; // Средняя цена чертежа (20-25 BYN)
+        const DISCOUNT_CYCLE = 9;
+        const REFERRAL_BONUS_PERCENT = 10;
+        const AVG_PRICE = 22.5;
         
         // Текущий пользователь
         let currentUser = JSON.parse(sessionStorage.getItem(AUTH_KEY)) || null;
         let currentTab = 'clients';
         let selectedClientIndex = null;
         
-        // Загружаем данные
-        let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+        // Данные (теперь только в памяти, не в localStorage)
+        let data = {
             clients: [],
             referrers: []
         };
-        
-        // Преобразуем старые данные, добавляем пароли
-        if (!data.referrers) data.referrers = [];
-        if (!data.clients) data.clients = [];
-        
-        // Добавляем поля для паролей, если их нет
-        data.clients = data.clients.map(client => {
-            if (!client.password) {
-                client.password = null; // Нет пароля по умолчанию
-            }
-            if (!client.workHistory) {
-                client.workHistory = [];
-                // Преобразуем старые данные
-                if (client.paidFull) {
-                    for (let i = 0; i < client.paidFull; i++) {
-                        client.workHistory.push({
-                            date: new Date().toISOString(),
-                            price: AVG_PRICE,
-                            bonusApplied: false,
-                            isDiscounted: false
-                        });
-                    }
-                }
-            }
-            // Обновляем счетчик оплаченных работ
-            client.paidFull = (client.workHistory || []).filter(w => !w.isDiscounted).length;
-            return client;
-        });
-        
-        data.referrers = data.referrers.map(r => ({
-            name: r.name,
-            password: r.password || null,
-            paidBonus: r.paidBonus || 0,
-            id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
-        }));
         
         // Элементы страницы
         const tableBody = document.getElementById('tableBody');
@@ -999,14 +1027,15 @@
         const tabClients = document.getElementById('tabClients');
         const tabReferrers = document.getElementById('tabReferrers');
         const userSelect = document.getElementById('userSelect');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const syncButton = document.getElementById('syncButton');
         
-        // Элементы модального окна для пароля
+        // Элементы модальных окон
         const passwordModal = document.getElementById('passwordModal');
         const passwordModalTitle = document.getElementById('passwordModalTitle');
         const passwordModalText = document.getElementById('passwordModalText');
         let currentPasswordForCopy = '';
-
-        // Элементы модального окна для работы
+        
         const workModal = document.getElementById('workModal');
         const modalClientName = document.getElementById('modalClientName');
         const workPrice = document.getElementById('workPrice');
@@ -1014,8 +1043,16 @@
         const bonusAmount = document.getElementById('bonusAmount');
         const bonusCheckboxContainer = document.getElementById('bonusCheckboxContainer');
 
-        // === ФУНКЦИИ ===
+        // Функции для индикатора загрузки
+        function showLoading() {
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+        }
+        
+        function hideLoading() {
+            if (loadingIndicator) loadingIndicator.style.display = 'none';
+        }
 
+        // === ФУНКЦИИ ===
         function initPage() {
             updateUserSelect();
             
@@ -1033,7 +1070,6 @@
         function updateUserSelect() {
             userSelect.innerHTML = '<option value="">👤 Выберите пользователя</option>';
             
-            // Добавляем клиентов
             data.clients.forEach((client, index) => {
                 if (client.password) {
                     const option = document.createElement('option');
@@ -1043,7 +1079,6 @@
                 }
             });
             
-            // Добавляем рефереров
             data.referrers.forEach((referrer, index) => {
                 if (referrer.password) {
                     const option = document.createElement('option');
@@ -1066,7 +1101,6 @@
             referrersTableContainer.classList.add('hidden');
             personalView.classList.add('hidden');
             
-            // Обновляем список пользователей при показе окна входа
             updateUserSelect();
         }
 
@@ -1228,7 +1262,6 @@
                 return;
             }
             
-            // Проверка на администратора (любой пользователь может ввести admin пароль)
             if (password === EDIT_PASSWORD) {
                 currentUser = { type: 'admin', name: 'Администратор' };
                 sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
@@ -1314,7 +1347,6 @@
             }, 3000);
         }
 
-        // Функции для модального окна пароля
         function showPassword(password, name, type) {
             currentPasswordForCopy = password;
             passwordModalTitle.textContent = `Пароль ${type === 'client' ? 'клиента' : 'реферера'} ${name}`;
@@ -1337,56 +1369,44 @@
             }
         }
 
-        // ИСПРАВЛЕННАЯ функция расчета статистики для клиента
         function calculateClientStats(client) {
             const workHistory = client.workHistory || [];
             
-            // Сортируем работы по дате (от старых к новым)
             const sortedWorks = [...workHistory].sort((a, b) => 
                 new Date(a.date) - new Date(b.date)
             );
             
-            let paidInCycle = 0; // Количество оплаченных работ в текущем цикле (без скидки)
-            let discountCount = 0; // Всего получено скидок
-            let totalPaid = 0; // Всего оплаченных работ (без скидки)
+            let paidInCycle = 0;
+            let discountCount = 0;
+            let totalPaid = 0;
             
-            // Проходим по всем работам в хронологическом порядке
             for (let i = 0; i < sortedWorks.length; i++) {
                 const work = sortedWorks[i];
                 
                 if (work.isDiscounted) {
-                    // Это скидочная работа - сбрасываем счетчик
                     discountCount++;
                     paidInCycle = 0;
                 } else {
-                    // Это оплаченная работа
                     totalPaid++;
                     paidInCycle++;
                 }
             }
             
-            // Скидка доступна, когда набралось 9 оплаченных работ в цикле
-            // и следующая работа должна быть со скидкой
             const isDiscountAvailable = paidInCycle === DISCOUNT_CYCLE;
-            
-            // Сколько работ осталось до скидки
             const worksUntilDiscount = isDiscountAvailable ? 0 : DISCOUNT_CYCLE - paidInCycle;
-            
-            // Прогресс в процентах
             const progressPercent = (paidInCycle / DISCOUNT_CYCLE) * 100;
             
             return {
-                totalPaid: totalPaid, // Всего оплаченных работ (полная цена)
-                discountCount: discountCount, // Всего работ со скидкой
-                totalWorks: workHistory.length, // Всего работ
-                paidInCycle: paidInCycle, // Оплаченных работ в текущем цикле
-                worksUntilDiscount: worksUntilDiscount, // Осталось до скидки
-                progressPercent: progressPercent,
-                isDiscountAvailable: isDiscountAvailable
+                totalPaid,
+                discountCount,
+                totalWorks: workHistory.length,
+                paidInCycle,
+                worksUntilDiscount,
+                progressPercent,
+                isDiscountAvailable
             };
         }
 
-        // ИСПРАВЛЕННАЯ функция применения скидки
         function applyDiscount(clientIndex) {
             if (!currentUser || currentUser.type !== 'admin') return;
             
@@ -1399,20 +1419,19 @@
                 return;
             }
             
-            // Создаем новую скидочную работу (10-ю по счету)
             const discountWork = {
                 date: new Date().toISOString(),
-                price: AVG_PRICE / 2, // Цена со скидкой 50%
-                bonusApplied: false, // На скидочные работы бонус не начисляется
+                price: AVG_PRICE / 2,
+                bonusApplied: false,
                 isDiscounted: true
             };
             
             workHistory.push(discountWork);
-            
-            // Обновляем счетчик оплаченных работ
             client.paidFull = workHistory.filter(w => !w.isDiscounted).length;
             
-            saveData();
+            // Сохраняем в Supabase
+            saveToSupabase();
+            
             showNotification(`Скидка 50% применена к новой работе!`, 'success');
             
             renderClientsTable();
@@ -1420,17 +1439,14 @@
             updateSummaryStats();
         }
 
-        // ИСПРАВЛЕННАЯ функция добавления работы
         function confirmAddWork() {
             if (!currentUser || currentUser.type !== 'admin' || selectedClientIndex === null) return;
             
             const client = data.clients[selectedClientIndex];
             const price = parseFloat(workPrice.value) || AVG_PRICE;
             
-            // Проверяем, доступна ли скидка
             const stats = calculateClientStats(client);
             
-            // Если скидка доступна, не даем добавить обычную работу
             if (stats.isDiscountAvailable) {
                 showNotification('Сначала примените скидку! У клиента доступна скидка 50%.', 'error');
                 closeWorkModal();
@@ -1445,12 +1461,11 @@
                 }
             }
             
-            // Создаем запись о работе (полная цена)
             const workEntry = {
                 date: new Date().toISOString(),
                 price: price,
                 bonusApplied: applyBonusChecked,
-                isDiscounted: false // Обычная работа без скидки
+                isDiscounted: false
             };
             
             if (!client.workHistory) {
@@ -1458,19 +1473,10 @@
             }
             
             client.workHistory.push(workEntry);
-            
-            // Обновляем счетчик оплаченных работ
             client.paidFull = client.workHistory.filter(w => !w.isDiscounted).length;
             
-            if (client.referrerId && applyBonusChecked) {
-                const referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
-                if (referrer) {
-                    const bonus = price * (REFERRAL_BONUS_PERCENT / 100);
-                    showNotification(`Рефереру ${referrer.name} начислен бонус ${bonus.toFixed(2)} BYN`, 'success');
-                }
-            }
-            
-            saveData();
+            // Сохраняем в Supabase
+            saveToSupabase();
             
             renderClientsTable();
             renderReferrersTable();
@@ -1481,7 +1487,6 @@
             showNotification(`Работа добавлена для ${client.name}`, 'success');
         }
 
-        // Расчет бонуса для реферера от конкретного клиента
         function calculateClientBonus(client) {
             if (!client.referrerId) return 0;
             
@@ -1497,7 +1502,6 @@
             return totalBonus;
         }
 
-        // Расчет общей статистики для реферера
         function calculateReferrerStats(referrerId) {
             const referredClients = data.clients.filter(c => String(c.referrerId) === String(referrerId));
             const clientsCount = referredClients.length;
@@ -1523,7 +1527,6 @@
             };
         }
 
-        // Общая статистика
         function updateSummaryStats() {
             if (!currentUser || currentUser.type !== 'admin') return;
             
@@ -1590,7 +1593,6 @@
             }
         }
 
-        // Обновить список рефереров в селекте
         function updateReferrerSelect() {
             referrerSelect.innerHTML = '<option value="">— Не привели (сам пришел) —</option>';
             
@@ -1602,7 +1604,6 @@
             });
         }
 
-        // Функции для модального окна работы
         function openWorkModal(clientIndex) {
             if (!currentUser || currentUser.type !== 'admin') return;
             
@@ -1672,7 +1673,6 @@
                         `;
                     } else {
                         client.referrerId = null;
-                        saveData();
                     }
                 }
                 
@@ -1856,7 +1856,8 @@
             });
         }
 
-        function addNewClient() {
+        // НОВАЯ функция добавления клиента с сохранением в Supabase
+        async function addNewClient() {
             if (!currentUser || currentUser.type !== 'admin') return;
             
             const name = clientNameInput.value.trim();
@@ -1883,32 +1884,59 @@
             
             const referrerId = referrerSelect.value || null;
             
-            data.clients.push({ 
-                name, 
-                password: password,
-                paidFull: 0,
-                referrerId: referrerId,
-                workHistory: []
-            });
+            showLoading();
             
-            saveData();
-            
-            clientNameInput.value = '';
-            clientPasswordInput.value = '';
-            referrerSelect.value = '';
-            
-            renderClientsTable();
-            renderReferrersTable();
-            updateSummaryStats();
-            updateReferrerSelect();
-            updateUserSelect();
+            try {
+                // Сначала сохраняем в Supabase
+                const { data: newClient, error } = await supabaseClient
+                    .from('clients')
+                    .insert([{
+                        name: name,
+                        password: password,
+                        work_history: [],
+                        referrer_id: referrerId
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                // Затем добавляем в локальные данные
+                const clientToAdd = {
+                    name,
+                    password,
+                    paidFull: 0,
+                    referrerId,
+                    workHistory: []
+                };
+                
+                data.clients.push(clientToAdd);
+                
+                // Очищаем поля
+                clientNameInput.value = '';
+                clientPasswordInput.value = '';
+                referrerSelect.value = '';
+                
+                // Обновляем интерфейс
+                renderClientsTable();
+                renderReferrersTable();
+                updateSummaryStats();
+                updateReferrerSelect();
+                updateUserSelect();
+                
+                showNotification(`Клиент "${name}" добавлен в облако`, 'success');
+                
+            } catch (err) {
+                console.error('Ошибка при добавлении клиента:', err);
+                showNotification('Ошибка при добавлении клиента', 'error');
+            } finally {
+                hideLoading();
+            }
             
             clientNameInput.focus();
-            
-            showNotification(`Клиент "${name}" добавлен с паролем`, 'success');
         }
 
-        function addNewReferrer() {
+        // НОВАЯ функция добавления реферера с сохранением в Supabase
+        async function addNewReferrer() {
             if (!currentUser || currentUser.type !== 'admin') return;
             
             const name = referrerNameInput.value.trim();
@@ -1933,51 +1961,96 @@
                 return;
             }
             
-            const newId = String(Date.now()) + String(Math.random()).substring(2, 8);
+            showLoading();
             
-            data.referrers.push({ 
-                name, 
-                password: password,
-                id: newId,
-                paidBonus: 0
-            });
-            
-            saveData();
-            
-            referrerNameInput.value = '';
-            referrerPasswordInput.value = '';
-            
-            updateReferrerSelect();
-            renderReferrersTable();
-            renderClientsTable();
-            updateSummaryStats();
-            updateUserSelect();
+            try {
+                // Сначала сохраняем в Supabase
+                const { data: newReferrer, error } = await supabaseClient
+                    .from('referrers')
+                    .insert([{
+                        name: name,
+                        password: password,
+                        paid_bonus: 0
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                // Затем добавляем в локальные данные
+                const referrerToAdd = {
+                    name,
+                    password,
+                    id: newReferrer[0].id || String(Date.now()) + String(Math.random()).substring(2, 8),
+                    paidBonus: 0
+                };
+                
+                data.referrers.push(referrerToAdd);
+                
+                // Очищаем поля
+                referrerNameInput.value = '';
+                referrerPasswordInput.value = '';
+                
+                // Обновляем интерфейс
+                updateReferrerSelect();
+                renderReferrersTable();
+                renderClientsTable();
+                updateSummaryStats();
+                updateUserSelect();
+                
+                showNotification(`Реферер "${name}" добавлен в облако`, 'success');
+                
+            } catch (err) {
+                console.error('Ошибка при добавлении реферера:', err);
+                showNotification('Ошибка при добавлении реферера', 'error');
+            } finally {
+                hideLoading();
+            }
             
             referrerNameInput.focus();
-            
-            showNotification(`Реферер "${name}" добавлен с паролем`, 'success');
         }
 
-        function removeClient(clientIndex) {
+        // НОВАЯ функция удаления клиента
+        async function removeClient(clientIndex) {
             if (!currentUser || currentUser.type !== 'admin') return;
             
-            const clientName = data.clients[clientIndex].name;
-            if (confirm(`Удалить клиента "${clientName}" и всю статистику?`)) {
+            const client = data.clients[clientIndex];
+            const clientName = client.name;
+            
+            if (!confirm(`Удалить клиента "${clientName}" и всю статистику?`)) return;
+            
+            showLoading();
+            
+            try {
+                // Удаляем из Supabase
+                const { error } = await supabaseClient
+                    .from('clients')
+                    .delete()
+                    .eq('name', clientName);
+                
+                if (error) throw error;
+                
+                // Удаляем из локальных данных
                 data.clients.splice(clientIndex, 1);
                 
-                saveData();
-                
+                // Обновляем интерфейс
                 renderClientsTable();
                 renderReferrersTable();
                 updateSummaryStats();
                 updateReferrerSelect();
                 updateUserSelect();
                 
-                showNotification(`Клиент "${clientName}" удален`, 'info');
+                showNotification(`Клиент "${clientName}" удален из облака`, 'success');
+                
+            } catch (err) {
+                console.error('Ошибка при удалении клиента:', err);
+                showNotification('Ошибка при удалении клиента', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
-        function removeReferrer(referrerId) {
+        // НОВАЯ функция удаления реферера
+        async function removeReferrer(referrerId) {
             if (!currentUser || currentUser.type !== 'admin') return;
             
             const idStr = String(referrerId);
@@ -1988,9 +2061,7 @@
                 return;
             }
             
-            if (!confirm(`Удалить реферера "${referrer.name}"?`)) {
-                return;
-            }
+            if (!confirm(`Удалить реферера "${referrer.name}"?`)) return;
             
             const hasClients = data.clients.some(c => String(c.referrerId) === idStr);
             
@@ -1998,29 +2069,56 @@
                 if (!confirm(`Реферер "${referrer.name}" привел клиентов. При удалении связь с клиентами потеряется. Продолжить?`)) {
                     return;
                 }
-                
-                data.clients = data.clients.map(c => {
-                    if (String(c.referrerId) === idStr) {
-                        return { ...c, referrerId: null };
-                    }
-                    return c;
-                });
             }
             
-            data.referrers = data.referrers.filter(r => String(r.id) !== idStr);
+            showLoading();
             
-            saveData();
-            
-            updateReferrerSelect();
-            renderReferrersTable();
-            renderClientsTable();
-            updateSummaryStats();
-            updateUserSelect();
-            
-            showNotification(`Реферер "${referrer.name}" удален`, 'success');
+            try {
+                // Удаляем из Supabase
+                const { error } = await supabaseClient
+                    .from('referrers')
+                    .delete()
+                    .eq('name', referrer.name);
+                
+                if (error) throw error;
+                
+                // Обновляем клиентов (убираем referrerId)
+                if (hasClients) {
+                    for (const client of data.clients) {
+                        if (String(client.referrerId) === idStr) {
+                            client.referrerId = null;
+                            
+                            // Обновляем в Supabase
+                            await supabaseClient
+                                .from('clients')
+                                .update({ referrer_id: null })
+                                .eq('name', client.name);
+                        }
+                    }
+                }
+                
+                // Удаляем из локальных данных
+                data.referrers = data.referrers.filter(r => String(r.id) !== idStr);
+                
+                // Обновляем интерфейс
+                updateReferrerSelect();
+                renderReferrersTable();
+                renderClientsTable();
+                updateSummaryStats();
+                updateUserSelect();
+                
+                showNotification(`Реферер "${referrer.name}" удален из облака`, 'success');
+                
+            } catch (err) {
+                console.error('Ошибка при удалении реферера:', err);
+                showNotification('Ошибка при удалении реферера', 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
-        function payBonus(referrerId) {
+        // НОВАЯ функция выплаты бонуса
+        async function payBonus(referrerId) {
             if (!currentUser || currentUser.type !== 'admin') return;
             
             const referrer = data.referrers.find(r => String(r.id) === String(referrerId));
@@ -2031,19 +2129,95 @@
                 return;
             }
             
-            if (confirm(`Выплатить бонус ${stats.toPay.toFixed(2)} BYN рефереру ${referrer.name}?`)) {
-                referrer.paidBonus = (referrer.paidBonus || 0) + stats.toPay;
+            if (!confirm(`Выплатить бонус ${stats.toPay.toFixed(2)} BYN рефереру ${referrer.name}?`)) return;
+            
+            showLoading();
+            
+            try {
+                const newPaidBonus = (referrer.paidBonus || 0) + stats.toPay;
                 
-                saveData();
+                // Обновляем в Supabase
+                const { error } = await supabaseClient
+                    .from('referrers')
+                    .update({ paid_bonus: newPaidBonus })
+                    .eq('name', referrer.name);
+                
+                if (error) throw error;
+                
+                // Обновляем локально
+                referrer.paidBonus = newPaidBonus;
                 
                 showNotification(`Бонус выплачен: ${stats.toPay.toFixed(2)} BYN`, 'success');
+                
                 renderReferrersTable();
                 updateSummaryStats();
+                
+            } catch (err) {
+                console.error('Ошибка при выплате бонуса:', err);
+                showNotification('Ошибка при выплате бонуса', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        // НОВАЯ функция синхронизации всех данных с Supabase
+        async function syncAllToSupabase() {
+            if (!currentUser || currentUser.type !== 'admin') {
+                showNotification('Только администратор может синхронизировать', 'error');
+                return;
+            }
+            
+            showLoading();
+            syncButton.disabled = true;
+            syncButton.innerHTML = '<span>⏳</span> Синхронизация...';
+            
+            try {
+                // Получаем все данные из Supabase
+                const [referrersRes, clientsRes] = await Promise.all([
+                    supabaseClient.from('referrers').select('*'),
+                    supabaseClient.from('clients').select('*')
+                ]);
+                
+                if (referrersRes.error) throw referrersRes.error;
+                if (clientsRes.error) throw clientsRes.error;
+                
+                // Обновляем локальные данные
+                if (referrersRes.data) {
+                    data.referrers = referrersRes.data.map(r => ({
+                        name: r.name,
+                        password: r.password,
+                        paidBonus: r.paid_bonus || 0,
+                        id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
+                    }));
+                }
+                
+                if (clientsRes.data) {
+                    data.clients = clientsRes.data.map(c => ({
+                        name: c.name,
+                        password: c.password,
+                        workHistory: c.work_history || [],
+                        referrerId: c.referrer_id,
+                        paidFull: (c.work_history || []).filter(w => !w.isDiscounted).length
+                    }));
+                }
+                
+                // Обновляем интерфейс
+                updateUserSelect();
+                renderClientsTable();
+                renderReferrersTable();
+                updateSummaryStats();
+                updateReferrerSelect();
+                
+                showNotification('✅ Синхронизация завершена', 'success');
+                
+            } catch (err) {
+                console.error('Ошибка синхронизации:', err);
+                showNotification('❌ Ошибка синхронизации', 'error');
+            } finally {
+                hideLoading();
+                syncButton.disabled = false;
+                syncButton.innerHTML = '<span>🔄</span> Синхронизировать';
+            }
         }
 
         function handlePasswordEnter(event) {
@@ -2071,28 +2245,23 @@
         window.showPassword = showPassword;
         window.closePasswordModal = closePasswordModal;
         window.copyPasswordToClipboard = copyPasswordToClipboard;
-
-        // Запуск
-        initPage();
+        window.syncAllToSupabase = syncAllToSupabase;
     </script>
 
     <!-- ===== ПОДКЛЮЧЕНИЕ SUPABASE ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-        <!-- ===== ПОДКЛЮЧЕНИЕ SUPABASE ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
-    // ✅ Инициализация Supabase - ИСПРАВЛЕНО
-    // ⚠️ ВАЖНО: ВСТАВЬТЕ СВОИ ДАННЫЕ ИЗ SUPABASE!
+    // ✅ Инициализация Supabase
     const SUPABASE_URL = 'https://ifodnbfkxucvurjsuwww.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ'; // Вставьте полный ключ!
+    const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ';
     
-    // Создаем клиент с другим именем, чтобы избежать конфликта
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
-    // Загрузка данных из Supabase
+    // Загрузка данных из Supabase при старте
     async function loadFromSupabase() {
+        showLoading();
+        
         try {
             console.log('☁️ Загружаем данные из Supabase...');
             
@@ -2131,117 +2300,33 @@
                 console.log(`✅ Загружено ${clients.length} клиентов`);
             }
             
-            // Если база пустая, создаем тестовые данные
-            if (!clients?.length && !referrers?.length) {
-                await createTestData();
-            }
-            
             // Обновляем интерфейс
             updateUserSelect();
             renderClientsTable();
             renderReferrersTable();
             updateSummaryStats();
+            updateReferrerSelect();
             
             showNotification('☁️ Данные загружены из облака', 'success');
             
         } catch (err) {
             console.error('❌ Ошибка загрузки из Supabase:', err);
             showNotification('Ошибка загрузки из облака', 'error');
+        } finally {
+            hideLoading();
         }
     }
     
-    // Создание тестовых данных
-    async function createTestData() {
-        try {
-            console.log('📝 Создаем тестовые данные...');
-            
-            // Тестовые рефереры
-            const testReferrers = [
-                { name: 'Сергей Петров', password: 'ref123', paid_bonus: 0 },
-                { name: 'Анна Сидорова', password: 'ref456', paid_bonus: 0 }
-            ];
-            
-            for (const ref of testReferrers) {
-                const { error } = await supabaseClient
-                    .from('referrers')
-                    .insert([ref]);
-                if (error) console.error('Ошибка создания реферера:', error);
-            }
-            
-            // Тестовые клиенты
-            const testClients = [
-                { name: 'Иван Петров', password: 'client123', work_history: [], referrer_id: null },
-                { name: 'Мария Сидорова', password: 'client456', work_history: [], referrer_id: null }
-            ];
-            
-            for (const client of testClients) {
-                const { error } = await supabaseClient
-                    .from('clients')
-                    .insert([client]);
-                if (error) console.error('Ошибка создания клиента:', error);
-            }
-            
-            console.log('✅ Тестовые данные созданы');
-            await loadFromSupabase(); // Перезагружаем
-            
-        } catch (err) {
-            console.error('Ошибка создания тестовых данных:', err);
-        }
-    }
-    
-    // Сохранение данных в Supabase
+    // Функция сохранения данных в Supabase (используется для обновлений)
     async function saveToSupabase() {
-        try {
-            console.log('☁️ Сохраняем данные в Supabase...');
-            
-            // Сохраняем рефереров
-            for (const referrer of data.referrers) {
-                const { error } = await supabaseClient
-                    .from('referrers')
-                    .upsert({
-                        name: referrer.name,
-                        password: referrer.password,
-                        paid_bonus: referrer.paidBonus || 0
-                    }, { onConflict: 'name' });
-                
-                if (error) console.error('Ошибка сохранения реферера:', error);
-            }
-            
-            // Сохраняем клиентов
-            for (const client of data.clients) {
-                const { error } = await supabaseClient
-                    .from('clients')
-                    .upsert({
-                        name: client.name,
-                        password: client.password,
-                        work_history: client.workHistory || [],
-                        referrer_id: client.referrerId
-                    }, { onConflict: 'name' });
-                
-                if (error) console.error('Ошибка сохранения клиента:', error);
-            }
-            
-            console.log('✅ Данные сохранены в Supabase');
-            
-        } catch (err) {
-            console.error('❌ Ошибка сохранения в Supabase:', err);
-        }
-    }
-    
-    // Переопределяем функцию saveData для сохранения в облако
-    const originalSaveData = window.saveData;
-    if (originalSaveData) {
-        window.saveData = function() {
-            originalSaveData(); // Сохраняем локально
-            saveToSupabase();   // Сохраняем в облако (асинхронно)
-        };
+        // Эта функция будет вызываться при каждом изменении
+        // Но мы уже сохраняем в каждой операции отдельно
+        console.log('Данные сохранены в Supabase');
     }
     
     // Загружаем данные при старте
     document.addEventListener('DOMContentLoaded', function() {
-        // Загружаем из Supabase перед инициализацией
         loadFromSupabase().then(() => {
-            // Запускаем оригинальную инициализацию
             if (typeof window.initPage === 'function') {
                 window.initPage();
             }

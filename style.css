@@ -1,854 +1,1061 @@
- 
-        /* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ===== */
-        :root {
-            --primary: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary: #764ba2;
-            --success: #27ae60;
-            --success-light: #e8f5e9;
-            --danger: #e74c3c;
-            --danger-light: #fdedec;
-            --warning: #f39c12;
-            --warning-light: #fff8e1;
-            --info: #3498db;
-            --info-light: #e8f4fd;
-            --dark: #2c3e50;
-            --gray: #7f8c8d;
-            --gray-light: #f8f9fa;
-            --border: #eaeaea;
-            --shadow: 0 10px 40px rgba(0,0,0,0.1);
-            --radius: 16px;
-            --radius-sm: 12px;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            margin: 0;
-            padding: 16px;
-            background: linear-gradient(145deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--dark);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .container {
-            max-width: 1600px;
-            width: 100%;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ===== ШАПКА ===== */
-        .header {
-            background: linear-gradient(145deg, var(--dark) 0%, var(--info) 100%);
-            color: white;
-            padding: 24px 32px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        h1 {
-            margin: 0 0 6px 0;
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h1 span {
-            font-size: 2rem;
-        }
-
-        .subtitle {
-            margin: 0;
-            opacity: 0.95;
-            font-size: clamp(0.85rem, 3vw, 1rem);
-            font-weight: 400;
-            line-height: 1.5;
-            max-width: 80%;
-        }
-
-        /* ===== ВКЛАДКИ ===== */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            padding: 20px 24px 0;
-            background: white;
-            border-bottom: 2px solid var(--border);
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: var(--gray-light);
-            border: 2px solid transparent;
-            border-bottom: none;
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--gray);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab.active {
-            background: white;
-            color: var(--info);
-            border-color: var(--info) var(--info) transparent var(--info);
-            margin-bottom: -2px;
-        }
-
-        /* ===== АВТОРИЗАЦИЯ ===== */
-        .auth-section {
-            padding: 40px 24px;
-            background: linear-gradient(145deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
-            border-bottom: 1px solid var(--border);
-        }
-
-        .auth-panel-simple {
-            max-width: 450px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .auth-title {
-            font-size: clamp(1.3rem, 5vw, 1.8rem);
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .auth-title span {
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            font-size: 2rem;
-        }
-
-        /* ===== ФОРМЫ ===== */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 16px;
-            font-size: 16px;
-            background: white;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        /* ===== КНОПКИ ===== */
-        .btn {
-            padding: 16px 28px;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: white;
-            color: var(--dark);
-            border: 2px solid transparent;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
-            color: white;
-            width: 100%;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--gray);
-            color: white;
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: white;
-        }
-
-        .btn-info {
-            background: var(--info);
-            color: white;
-        }
-
-        /* ===== ИНДИКАТОР РЕЖИМА ===== */
-        .mode-indicator {
-            padding: 16px 24px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .view-mode {
-            background: var(--gray-light);
-            color: var(--gray);
-        }
-
-        .edit-mode {
-            background: var(--info-light);
-            color: var(--info);
-            border-left: 4px solid var(--info);
-        }
-
-        /* ===== ПАНЕЛИ УПРАВЛЕНИЯ ===== */
-        .edit-controls {
-            padding: 24px;
-            background: white;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            align-items: end;
-        }
-
-        /* ===== ТАБЛИЦЫ ===== */
-        .table-container {
-            padding: 0;
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-            background: white;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            min-width: 1000px;
-        }
-
-        thead {
-            background: var(--gray-light);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        th {
-            padding: 18px 16px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 20px 16px;
-            vertical-align: middle;
-        }
-
-        /* ===== КАРТОЧКИ СТАТИСТИКИ ===== */
-        .client-info {
-            min-width: 200px;
-        }
-
-        .client-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--dark);
-            margin-bottom: 6px;
-        }
-
-        .client-id {
-            font-size: 0.75rem;
-            color: var(--gray);
-            font-family: 'Monaco', 'Consolas', monospace;
-        }
-
-        .stat-card {
-            background: var(--gray-light);
-            border-radius: 12px;
-            padding: 12px 15px;
-            min-width: 100px;
-        }
-
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 4px;
-            line-height: 1.2;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-
-        .discount-stat {
-            background: var(--warning-light);
-            border-left: 4px solid var(--warning);
-        }
-
-        .discount-stat .stat-value {
-            color: var(--warning);
-        }
-
-        .bonus-stat {
-            background: var(--info-light);
-            border-left: 4px solid var(--info);
-        }
-
-        .bonus-stat .stat-value {
-            color: var(--info);
-        }
-
-        /* ===== ИНДИКАТОРЫ СКИДОК ===== */
-        .discount-indicator {
-            display: inline-flex;
-            align-items: center;
-            padding: 10px 16px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .discount-available {
-            background: var(--success-light);
-            color: #2e7d32;
-            border: 2px solid var(--success);
-        }
-
-        .discount-pending {
-            background: var(--warning-light);
-            color: #ef6c00;
-            border: 2px solid var(--warning);
-        }
-
-        /* ===== ПРОГРЕСС БАР ===== */
-        .progress-container {
-            min-width: 150px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .progress-bar-bg {
-            height: 8px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--info), var(--success));
-            border-radius: 10px;
-        }
-
-        /* ===== ДЕЙСТВИЯ ===== */
-        .actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            padding: 8px 16px;
-            border: 2px solid;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 90px;
-            justify-content: center;
-            background: white;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .action-add {
-            border-color: var(--info);
-            color: var(--info);
-        }
-
-        .action-add:hover {
-            background: var(--info);
-            color: white;
-        }
-
-        .action-discount {
-            border-color: var(--warning);
-            color: var(--warning);
-        }
-
-        .action-discount:hover {
-            background: var(--warning);
-            color: white;
-        }
-
-        .action-remove {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .action-remove:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .action-pay {
-            border-color: var(--success);
-            color: var(--success);
-        }
-
-        .action-pay:hover {
-            background: var(--success);
-            color: white;
-        }
-
-        /* ===== МОДАЛЬНЫЕ ОКНА ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 16px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 32px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 25px;
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        /* ===== УВЕДОМЛЕНИЯ ===== */
-        .notification {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            padding: 16px 24px;
-            border-radius: 20px;
-            color: white;
-            font-weight: 600;
-            z-index: 10000;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            min-width: 300px;
-            max-width: 400px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .notification-success {
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-        }
-
-        .notification-error {
-            background: linear-gradient(145deg, #e74c3c, #c0392b);
-        }
-
-        .notification-info {
-            background: linear-gradient(145deg, #3498db, #2980b9);
-        }
-
-        /* ===== ИНДИКАТОР ЗАГРУЗКИ ===== */
-        .loading-indicator {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--dark);
-            color: white;
-            padding: 14px 28px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 10001;
-            font-weight: 600;
-            display: none;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .loading-indicator span {
-            display: inline-block;
-            margin-right: 10px;
-        }
-
-        /* ===== БЕЙДЖИ ===== */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            background: #e0e0e0;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-referrer {
-            background: var(--info-light);
-            color: var(--info);
-        }
-
-        .referrer-badge {
-            font-size: 0.8rem;
-            color: var(--gray);
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* ===== ПАРОЛИ ===== */
-        .password-cell {
-            position: relative;
-        }
-
-        .password-cell .btn-info {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border-radius: 20px;
-        }
-
-        /* ===== ФУТЕР ===== */
-        .footer {
-            padding: 24px 32px;
-            background: var(--gray-light);
-            border-top: 1px solid var(--border);
-            color: var(--gray);
-            font-size: 0.9rem;
-            text-align: center;
-        }
-
-        .summary-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .summary-stat {
-            text-align: center;
-            min-width: 120px;
-            padding: 15px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .summary-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 5px;
-            line-height: 1.2;
-        }
-
-        .summary-label {
-            font-size: 0.8rem;
-            color: var(--gray);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-       
-
-        .auth-note {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            text-align: center;
-            border: 1px dashed #cbd5e0;
-        }
-
-        .auth-note code {
-            background: #e2e8f0;
-            padding: 3px 8px;
-            border-radius: 6px;
-            color: #2d3748;
-            font-weight: 600;
-        }
-
-        .user-selector {
-            margin-bottom: 20px;
-        }
-
-        .user-selector select {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 15px;
-            background: white;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        /* ===== АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ ===== */
-        @media (max-width: 768px) {
-            body {
-                padding: 8px;
-            }
-
-            .header {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-                gap: 8px;
-            }
-
-            h1 span {
-                font-size: 1.5rem;
-            }
-
-            .subtitle {
-                max-width: 100%;
-                font-size: 0.8rem;
-            }
-
-            .tabs {
-                padding: 16px 16px 0;
-                gap: 4px;
-            }
-
-            .tab {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-            }
-
-            .auth-panel-simple {
-                padding: 24px 20px;
-            }
-
-            .auth-title {
-                font-size: 1.3rem;
-                gap: 8px;
-                margin-bottom: 20px;
-            }
-
-            .form-control {
-                padding: 14px 16px;
-                font-size: 16px;
-            }
-
-            .btn {
-                padding: 14px 20px;
-                font-size: 15px;
-            }
-
-            .edit-controls {
-                padding: 16px;
-            }
-
-            .controls-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-
-            .table-container {
-                max-height: 500px;
-            }
-
-            td {
-                padding: 15px 12px;
-            }
-
-            .actions {
-                flex-direction: column;
-                gap: 6px;
-            }
-
-            .action-btn {
-                width: 100%;
-                padding: 10px 12px;
-                min-width: auto;
-            }
-
-            .discount-indicator {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 8px 12px;
-            }
-
-            .summary-stats {
-                gap: 15px;
-            }
-
-            .summary-stat {
-                min-width: calc(50% - 15px);
-                padding: 12px;
-            }
-
-            .summary-value {
-                font-size: 1.5rem;
-            }
-
-            .modal-content {
-                padding: 24px 20px;
-            }
-
-            .modal-title {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
-            }
-
-            .notification {
-                left: 16px;
-                right: 16px;
-                min-width: auto;
-                max-width: none;
-            }
-
-            .loading-indicator {
-                width: calc(100% - 32px);
-                text-align: center;
-                font-size: 0.9rem;
-                padding: 12px 20px;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .tab {
-                padding: 8px 12px;
-                font-size: 0.8rem;
-            }
-
-            .summary-stat {
-                min-width: 100%;
-            }
-
-            .client-name {
-                font-size: 1rem;
-            }
-
-            .stat-value {
-                font-size: 1.2rem;
-            }
-        }
+/* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ===== */
+:root {
+    --primary: #667eea;
+    --primary-dark: #5a67d8;
+    --secondary: #764ba2;
+    --success: #27ae60;
+    --success-light: #e8f5e9;
+    --danger: #e74c3c;
+    --danger-light: #fdedec;
+    --warning: #f39c12;
+    --warning-light: #fff8e1;
+    --info: #3498db;
+    --info-light: #e8f4fd;
+    --dark: #2c3e50;
+    --gray: #7f8c8d;
+    --gray-light: #f8f9fa;
+    --border: #eaeaea;
+    --shadow: 0 10px 40px rgba(0,0,0,0.1);
+    --radius: 16px;
+    --radius-sm: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 16px;
+    background: linear-gradient(145deg, var(--primary) 0%, var(--secondary) 100%);
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.container {
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== УЛУЧШЕННАЯ ШАПКА САЙТА ===== */
+.site-header {
+    background: linear-gradient(145deg, var(--dark) 0%, var(--info) 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: 20px 32px 0;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.logo-badge {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 30px;
+    align-self: flex-start;
+    margin-top: 5px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-stats {
+    display: flex;
+    gap: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 12px 25px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.stat-icon {
+    font-size: 1.3rem;
+}
+
+.stat-count {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.header-main {
+    text-align: center;
+    padding: 20px 0 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-main h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 15px;
+    text-shadow: 0 2px 15px rgba(0,0,0,0.3);
+    letter-spacing: -0.5px;
+    color: white;
+}
+
+.header-features {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.feature-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.feature-badge:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.2);
+}
+
+.header-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    z-index: 1;
+}
+
+.header-wave svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* ===== СТАРАЯ ШАПКА (ОСТАВЛЯЕМ ДЛЯ СОВМЕСТИМОСТИ) ===== */
+.header {
+    background: linear-gradient(145deg, var(--dark) 0%, var(--info) 100%);
+    color: white;
+    padding: 24px 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+h1 {
+    margin: 0 0 6px 0;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+h1 span {
+    font-size: 2rem;
+}
+
+.subtitle {
+    margin: 0;
+    opacity: 0.95;
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 80%;
+}
+
+/* ===== ВКЛАДКИ ===== */
+.tabs {
+    display: flex;
+    gap: 8px;
+    padding: 20px 24px 0;
+    background: white;
+    border-bottom: 2px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 12px 24px;
+    background: var(--gray-light);
+    border: 2px solid transparent;
+    border-bottom: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--gray);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab.active {
+    background: white;
+    color: var(--info);
+    border-color: var(--info) var(--info) transparent var(--info);
+    margin-bottom: -2px;
+}
+
+/* ===== АВТОРИЗАЦИЯ ===== */
+.auth-section {
+    padding: 40px 24px;
+    background: linear-gradient(145deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+    border-bottom: 1px solid var(--border);
+}
+
+.auth-panel-simple {
+    max-width: 450px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.auth-title {
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+}
+
+.auth-title span {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-size: 2rem;
+}
+
+/* ===== ФОРМЫ ===== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 16px;
+    font-size: 16px;
+    background: white;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* ===== КНОПКИ ===== */
+.btn {
+    padding: 16px 28px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: white;
+    color: var(--dark);
+    border: 2px solid transparent;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.btn-primary {
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    color: white;
+    width: 100%;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: var(--gray);
+    color: white;
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-info {
+    background: var(--info);
+    color: white;
+}
+
+/* ===== ИНДИКАТОР РЕЖИМА ===== */
+.mode-indicator {
+    padding: 16px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.view-mode {
+    background: var(--gray-light);
+    color: var(--gray);
+}
+
+.edit-mode {
+    background: var(--info-light);
+    color: var(--info);
+    border-left: 4px solid var(--info);
+}
+
+/* ===== ПАНЕЛИ УПРАВЛЕНИЯ ===== */
+.edit-controls {
+    padding: 24px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: end;
+}
+
+/* ===== ТАБЛИЦЫ ===== */
+.table-container {
+    padding: 0;
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+    background: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1000px;
+}
+
+thead {
+    background: var(--gray-light);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+th {
+    padding: 18px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--border);
+}
+
+td {
+    padding: 20px 16px;
+    vertical-align: middle;
+}
+
+/* ===== КАРТОЧКИ СТАТИСТИКИ ===== */
+.client-info {
+    min-width: 200px;
+}
+
+.client-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 6px;
+}
+
+.client-id {
+    font-size: 0.75rem;
+    color: var(--gray);
+    font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.stat-card {
+    background: var(--gray-light);
+    border-radius: 12px;
+    padding: 12px 15px;
+    min-width: 100px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.discount-stat {
+    background: var(--warning-light);
+    border-left: 4px solid var(--warning);
+}
+
+.discount-stat .stat-value {
+    color: var(--warning);
+}
+
+.bonus-stat {
+    background: var(--info-light);
+    border-left: 4px solid var(--info);
+}
+
+.bonus-stat .stat-value {
+    color: var(--info);
+}
+
+/* ===== ИНДИКАТОРЫ СКИДОК ===== */
+.discount-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.discount-available {
+    background: var(--success-light);
+    color: #2e7d32;
+    border: 2px solid var(--success);
+}
+
+.discount-pending {
+    background: var(--warning-light);
+    color: #ef6c00;
+    border: 2px solid var(--warning);
+}
+
+/* ===== ПРОГРЕСС БАР ===== */
+.progress-container {
+    min-width: 150px;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.progress-bar-bg {
+    height: 8px;
+    background: #ecf0f1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--info), var(--success));
+    border-radius: 10px;
+}
+
+/* ===== ДЕЙСТВИЯ ===== */
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: 2px solid;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+    justify-content: center;
+    background: white;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.action-add {
+    border-color: var(--info);
+    color: var(--info);
+}
+
+.action-add:hover {
+    background: var(--info);
+    color: white;
+}
+
+.action-discount {
+    border-color: var(--warning);
+    color: var(--warning);
+}
+
+.action-discount:hover {
+    background: var(--warning);
+    color: white;
+}
+
+.action-remove {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.action-remove:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.action-pay {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.action-pay:hover {
+    background: var(--success);
+    color: white;
+}
+
+/* ===== МОДАЛЬНЫЕ ОКНА ===== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 16px;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 32px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 25px;
+    background: linear-gradient(145deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* ===== УВЕДОМЛЕНИЯ ===== */
+.notification {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    padding: 16px 24px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    min-width: 300px;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.notification-success {
+    background: linear-gradient(145deg, #2ecc71, #27ae60);
+}
+
+.notification-error {
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
+}
+
+.notification-info {
+    background: linear-gradient(145deg, #3498db, #2980b9);
+}
+
+/* ===== ИНДИКАТОР ЗАГРУЗКИ ===== */
+.loading-indicator {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 10001;
+    font-weight: 600;
+    display: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.loading-indicator span {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* ===== БЕЙДЖИ ===== */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #e0e0e0;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-referrer {
+    background: var(--info-light);
+    color: var(--info);
+}
+
+.referrer-badge {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ===== ПАРОЛИ ===== */
+.password-cell {
+    position: relative;
+}
+
+.password-cell .btn-info {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+}
+
+/* ===== ФУТЕР ===== */
+.footer {
+    padding: 24px 32px;
+    background: var(--gray-light);
+    border-top: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.summary-stat {
+    text-align: center;
+    min-width: 120px;
+    padding: 15px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.summary-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.auth-note {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    text-align: center;
+    border: 1px dashed #cbd5e0;
+}
+
+.auth-note code {
+    background: #e2e8f0;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.user-selector {
+    margin-bottom: 20px;
+}
+
+.user-selector select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    background: white;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* ===== АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ ===== */
+@media (max-width: 768px) {
+    body {
+        padding: 8px;
+    }
+
+    .site-header {
+        padding: 15px 20px 0;
+    }
     
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .logo-area {
+        width: 100%;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.6rem;
+    }
+    
+    .logo-icon {
+        font-size: 2.5rem;
+    }
+    
+    .header-stats {
+        width: 100%;
+        justify-content: space-around;
+        padding: 10px 15px;
+    }
+    
+    .header-stat {
+        font-size: 0.9rem;
+    }
+    
+    .stat-icon {
+        font-size: 1.1rem;
+    }
+    
+    .stat-count {
+        font-size: 1rem;
+    }
+    
+    .header-main h2 {
+        font-size: 1.5rem;
+    }
+    
+    .feature-badge {
+        padding: 6px 15px;
+        font-size: 0.85rem;
+    }
+
+    .header {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        gap: 8px;
+    }
+
+    h1 span {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        max-width: 100%;
+        font-size: 0.8rem;
+    }
+
+    .tabs {
+        padding: 16px 16px 0;
+        gap: 4px;
+    }
+
+    .tab {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    .auth-panel-simple {
+        padding: 24px 20px;
+    }
+
+    .auth-title {
+        font-size: 1.3rem;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        padding: 14px 16px;
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .edit-controls {
+        padding: 16px;
+    }
+
+    .controls-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .table-container {
+        max-height: 500px;
+    }
+
+    td {
+        padding: 15px 12px;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .action-btn {
+        width: 100%;
+        padding: 10px 12px;
+        min-width: auto;
+    }
+
+    .discount-indicator {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 12px;
+    }
+
+    .summary-stats {
+        gap: 15px;
+    }
+
+    .summary-stat {
+        min-width: calc(50% - 15px);
+        padding: 12px;
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+    }
+
+    .modal-content {
+        padding: 24px 20px;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .notification {
+        left: 16px;
+        right: 16px;
+        min-width: auto;
+        max-width: none;
+    }
+
+    .loading-indicator {
+        width: calc(100% - 32px);
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-stats {
+        flex-wrap: wrap;
+        border-radius: 20px;
+    }
+    
+    .header-stat {
+        width: calc(50% - 10px);
+        justify-content: center;
+    }
+    
+    .header-main h2 {
+        font-size: 1.3rem;
+    }
+    
+    .feature-badge {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 380px) {
+    .tab {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .summary-stat {
+        min-width: 100%;
+    }
+
+    .client-name {
+        font-size: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+}

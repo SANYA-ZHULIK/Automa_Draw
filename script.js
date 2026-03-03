@@ -163,6 +163,15 @@ async function updateClientStats(client) {
 
 // === ОСНОВНЫЕ ФУНКЦИИ ===
 function initPage() {
+    // Скрываем все таблицы и панели при загрузке
+    clientsTableContainer.classList.add('hidden');
+    referrersTableContainer.classList.add('hidden');
+    editControlsClients.classList.add('hidden');
+    editControlsReferrers.classList.add('hidden');
+    personalView.classList.add('hidden');
+    document.querySelector('.tabs').classList.add('hidden');
+    hideAdminFooterStats();
+    
     updateUserSelect();
     
     if (currentUser) {

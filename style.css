@@ -1058,4 +1058,211 @@ td {
     .stat-value {
         font-size: 1.2rem;
     }
+    /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ШАПКИ ===== */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-icon {
+    font-size: 3rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo-text h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    color: white;
+}
+
+.logo-badge {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 30px;
+    align-self: flex-start;
+    margin-top: 5px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-stats {
+    display: flex;
+    gap: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 12px 25px;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+}
+
+.stat-icon {
+    font-size: 1.3rem;
+}
+
+.stat-count {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.header-main {
+    text-align: center;
+    padding: 20px 0 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.header-main h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0 0 15px;
+    text-shadow: 0 2px 15px rgba(0,0,0,0.3);
+    letter-spacing: -0.5px;
+    color: white;
+}
+
+.header-features {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.feature-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 500;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    color: white;
+}
+
+.feature-badge:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.2);
+}
+
+.header-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    z-index: 1;
+}
+
+.header-wave svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .header {
+        padding: 15px 20px 0;
+    }
+    
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .logo-area {
+        width: 100%;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.6rem;
+    }
+    
+    .logo-icon {
+        font-size: 2.5rem;
+    }
+    
+    .header-stats {
+        width: 100%;
+        justify-content: space-around;
+        padding: 10px 15px;
+    }
+    
+    .header-stat {
+        font-size: 0.9rem;
+    }
+    
+    .stat-icon {
+        font-size: 1.1rem;
+    }
+    
+    .stat-count {
+        font-size: 1rem;
+    }
+    
+    .header-main h2 {
+        font-size: 1.5rem;
+    }
+    
+    .feature-badge {
+        padding: 6px 15px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-stats {
+        flex-wrap: wrap;
+        border-radius: 20px;
+    }
+    
+    .header-stat {
+        width: calc(50% - 10px);
+        justify-content: center;
+    }
+    
+    .header-main h2 {
+        font-size: 1.3rem;
+    }
+    
+    .feature-badge {
+        width: 100%;
+        text-align: center;
+    }
+}
 }

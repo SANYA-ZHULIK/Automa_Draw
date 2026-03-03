@@ -61,7 +61,8 @@ const workPrice = document.getElementById('workPrice');
 const applyBonus = document.getElementById('applyBonus');
 const bonusAmount = document.getElementById('bonusAmount');
 const bonusCheckboxContainer = document.getElementById('bonusCheckboxContainer');
-// ===== ВОТ СЮДА ДОБАВЬ ЭТОТ КОД =====
+
+
 // Проверка наличия всех необходимых элементов
 console.log('📋 Элементы страницы:', {
     adminFooterStats: adminFooterStats ? '✅' : '❌',

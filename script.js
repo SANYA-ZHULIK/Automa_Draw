@@ -61,7 +61,28 @@ const workPrice = document.getElementById('workPrice');
 const applyBonus = document.getElementById('applyBonus');
 const bonusAmount = document.getElementById('bonusAmount');
 const bonusCheckboxContainer = document.getElementById('bonusCheckboxContainer');
+// ===== ВОТ СЮДА ДОБАВЬ ЭТОТ КОД =====
+// Проверка наличия всех необходимых элементов
+console.log('📋 Элементы страницы:', {
+    adminFooterStats: adminFooterStats ? '✅' : '❌',
+    summaryStats: summaryStats ? '✅' : '❌',
+    tableBody: tableBody ? '✅' : '❌',
+    authSection: authSection ? '✅' : '❌',
+    modeIndicator: modeIndicator ? '✅' : '❌',
+    modeText: modeText ? '✅' : '❌',
+    editControlsClients: editControlsClients ? '✅' : '❌',
+    editControlsReferrers: editControlsReferrers ? '✅' : '❌'
+});
 
+// Если adminFooterStats не найден, создай предупреждение
+if (!adminFooterStats) {
+    console.warn('⚠️ adminFooterStats не найден! Статистика в футере не будет работать.');
+}
+
+// Если summaryStats не найден, создай предупреждение
+if (!summaryStats) {
+    console.warn('⚠️ summaryStats не найден!');
+}
 // === ФУНКЦИИ ДЛЯ ИНДИКАТОРА ЗАГРУЗКИ ===
 function showLoading() {
     if (loadingIndicator) loadingIndicator.style.display = 'block';
@@ -217,10 +238,14 @@ function enterAdminMode() {
     updateReferrerSelect();
     renderClientsTable();
     renderReferrersTable();
-    updateSummaryStats();
     
-    // Показываем статистику в футере для админа
-    showAdminFooterStats();
+    // ВАЖНО: Проверяем, что adminFooterStats существует перед вызовом
+    if (adminFooterStats) {
+        updateSummaryStats();
+        showAdminFooterStats();
+    } else {
+        console.warn('⚠️ adminFooterStats не найден, статистика не показана');
+    }
 }
 
 function enterUserMode(user) {
@@ -682,32 +707,34 @@ function calculateReferrerStats(referrerId) {
 function updateSummaryStats() {
     if (!currentUser || currentUser.type !== 'admin') return;
     
-    const totalClients = data.clients.length;
-    const totalReferrers = data.referrers.length;
+    // Проверяем, что элемент существует
+    if (!adminFooterStats) {
+        console.error('❌ adminFooterStats не найден в DOM');
+        return;
+    }
     
-    let totalWorks = 0;
-    let totalPaidWorks = 0;
-    let totalDiscountWorks = 0;
-    let totalBonus = 0;
-    let totalPaidBonus = 0;
+    var totalClients = data.clients.length;
+    var totalReferrers = data.referrers.length;
     
-    data.clients.forEach(client => {
-        const stats = calculateClientStats(client);
+    var totalWorks = 0;
+    var totalPaidWorks = 0;
+    var totalDiscountWorks = 0;
+    var totalBonus = 0;
+    var totalPaidBonus = 0;
+    
+    for (var i = 0; i < data.clients.length; i++) {
+        var client = data.clients[i];
+        var stats = calculateClientStats(client);
         totalWorks += stats.totalWorks;
         totalPaidWorks += stats.totalPaid;
         totalDiscountWorks += stats.discountCount;
-    });
+    }
     
-    data.referrers.forEach(referrer => {
-        const stats = calculateReferrerStats(referrer.id);
+    for (var j = 0; j < data.referrers.length; j++) {
+        var referrer = data.referrers[j];
+        var stats = calculateReferrerStats(referrer.id);
         totalBonus += stats.totalBonus;
         totalPaidBonus += stats.paidBonus;
-    });
-    
-    // ✅ ИСПРАВЛЕНО: используем adminFooterStats вместо summaryStats
-    if (!adminFooterStats) {
-        console.warn('adminFooterStats не найден в DOM');
-        return;
     }
     
     if (currentTab === 'clients') {
@@ -1337,55 +1364,76 @@ function handlePasswordEnter(event) {
 }
 
 // Загрузка данных из Supabase при старте
-async function loadFromSupabase() {
+function loadFromSupabase() {
     showLoading();
     
-    try {
-        console.log('☁️ Загружаем данные из Supabase...');
-        
-        const [referrersRes, clientsRes] = await Promise.all([
-            supabaseClient.from('referrers').select('*'),
-            supabaseClient.from('clients').select('*')
-        ]);
-        
-        if (referrersRes.error) throw referrersRes.error;
-        if (clientsRes.error) throw clientsRes.error;
-        
-        if (referrersRes.data) {
-            data.referrers = referrersRes.data.map(r => ({
-                name: r.name,
-                password: r.password,
-                paidBonus: r.paid_bonus || 0,
-                id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
-            }));
-            console.log(`✅ Загружено ${referrersRes.data.length} рефереров`);
-        }
-        
-        if (clientsRes.data) {
-            data.clients = clientsRes.data.map(c => ({
-                name: c.name,
-                password: c.password,
-                workHistory: c.work_history || [],
-                referrerId: c.referrer_id,
-                paidFull: (c.work_history || []).filter(w => !w.isDiscounted).length
-            }));
-            console.log(`✅ Загружено ${clientsRes.data.length} клиентов`);
-        }
-        
-        updateUserSelect();
-        renderClientsTable();
-        renderReferrersTable();
-        updateSummaryStats();
-        updateReferrerSelect();
-        
-        showNotification('☁️ Данные загружены из облака', 'success');
-        
-    } catch (err) {
-        console.error('❌ Ошибка загрузки из Supabase:', err);
-        showNotification('Ошибка загрузки из облака', 'error');
-    } finally {
-        hideLoading();
-    }
+    console.log('☁️ Загружаем данные из Supabase...');
+    
+    // Загружаем рефереров
+    supabaseClient
+        .from('referrers')
+        .select('*')
+        .then(function(response) {
+            if (response.error) throw response.error;
+            
+            if (response.data && response.data.length > 0) {
+                data.referrers = response.data.map(function(r) {
+                    return {
+                        name: r.name,
+                        password: r.password,
+                        paidBonus: r.paid_bonus || 0,
+                        id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
+                    };
+                });
+                console.log('✅ Загружено ' + response.data.length + ' рефереров');
+            }
+            
+            // Загружаем клиентов
+            return supabaseClient
+                .from('clients')
+                .select('*');
+        })
+        .then(function(response) {
+            if (response.error) throw response.error;
+            
+            if (response.data && response.data.length > 0) {
+                data.clients = response.data.map(function(c) {
+                    return {
+                        name: c.name,
+                        password: c.password,
+                        workHistory: c.work_history || [],
+                        referrerId: c.referrer_id,
+                        paidFull: (c.work_history || []).filter(function(w) { 
+                            return !w.isDiscounted; 
+                        }).length
+                    };
+                });
+                console.log('✅ Загружено ' + response.data.length + ' клиентов');
+            }
+            
+            // Обновляем интерфейс
+            updateUserSelect();
+            renderClientsTable();
+            renderReferrersTable();
+            
+            // ВАЖНО: Проверяем, что adminFooterStats существует перед вызовом
+            if (adminFooterStats) {
+                updateSummaryStats();
+            } else {
+                console.warn('⚠️ adminFooterStats не найден, статистика не обновлена');
+            }
+            
+            updateReferrerSelect();
+            
+            showNotification('☁️ Данные загружены из облака', 'success');
+            
+            hideLoading();
+        })
+        .catch(function(err) {
+            console.error('❌ Ошибка загрузки из Supabase:', err);
+            showNotification('Ошибка загрузки из облака', 'error');
+            hideLoading();
+        });
 }
 
 // === ИНИЦИАЛИЗАЦИЯ ===

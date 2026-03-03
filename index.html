@@ -1087,7 +1087,7 @@
         const AUTH_KEY = 'currentUser';
         const DISCOUNT_CYCLE = 9;
         const REFERRAL_BONUS_PERCENT = 10;
-        const AVG_PRICE = 22.5;
+        const AVG_PRICE = 20;
         
         // Текущий пользователь
         let currentUser = JSON.parse(sessionStorage.getItem(AUTH_KEY)) || null;
@@ -1515,124 +1515,260 @@
         }
 
         // ИСПРАВЛЕННАЯ функция применения скидки
-        async function applyDiscount(clientIndex) {
-            if (!currentUser || currentUser.type !== 'admin') return;
-            
-            const client = data.clients[clientIndex];
-            const workHistory = client.workHistory || [];
-            
-            const stats = calculateClientStats(client);
-            if (!stats.isDiscountAvailable) {
-                showNotification(`Скидка еще не доступна. Нужно ${DISCOUNT_CYCLE} оплаченных работ подряд.`, 'error');
-                return;
-            }
-            
-            const discountWork = {
-                date: new Date().toISOString(),
-                price: AVG_PRICE / 2,
-                bonusApplied: false,
-                isDiscounted: true
-            };
-            
-            showLoading();
-            
-            try {
-                workHistory.push(discountWork);
-                client.paidFull = workHistory.filter(w => !w.isDiscounted).length;
-                
-                const { error } = await supabaseClient
-                    .from('clients')
-                    .update({
-                        work_history: workHistory
-                    })
-                    .eq('name', client.name);
-                
-                if (error) throw error;
-                
-                showNotification(`Скидка 50% применена к новой работе!`, 'success');
-                
-                renderClientsTable();
-                renderReferrersTable();
-                updateSummaryStats();
-                
-            } catch (err) {
-                console.error('Ошибка при применении скидки:', err);
-                showNotification('Ошибка при сохранении скидки', 'error');
-            } finally {
-                hideLoading();
-            }
+        // ИСПРАВЛЕННАЯ функция применения скидки
+// ИСПРАВЛЕННАЯ функция применения скидки
+// ИСПРАВЛЕННАЯ функция применения скидки
+async function applyDiscount(clientIndex) {
+    if (!currentUser || currentUser.type !== 'admin') return;
+    
+    const client = data.clients[clientIndex];
+    const workHistory = client.workHistory || [];
+    
+    const stats = calculateClientStats(client);
+    if (!stats.isDiscountAvailable) {
+        showNotification(`Скидка еще не доступна. Нужно ${DISCOUNT_CYCLE} оплаченных работ подряд.`, 'error');
+        return;
+    }
+    
+    const discountWork = {
+        date: new Date().toISOString(),
+        price: AVG_PRICE / 2,
+        bonusApplied: false,
+        isDiscounted: true
+    };
+    
+    showLoading();
+    
+    try {
+        console.log('📝 Применяем скидку для клиента:', client.name);
+        
+        // 1. Добавляем скидочную работу в историю
+        workHistory.push(discountWork);
+        client.paidFull = workHistory.filter(w => !w.isDiscounted).length;
+        
+        // 2. Сохраняем клиента
+        const { error: clientError } = await supabaseClient
+            .from('clients')
+            .update({
+                work_history: workHistory
+            })
+            .eq('name', client.name);
+        
+        if (clientError) throw clientError;
+        console.log('✅ Клиент обновлен');
+        
+        // 3. Находим ID клиента в базе данных
+        const { data: clientData, error: clientFindError } = await supabaseClient
+            .from('clients')
+            .select('id')
+            .eq('name', client.name)
+            .single();
+        
+        if (clientFindError) throw clientFindError;
+        
+        if (!clientData) {
+            throw new Error('Клиент не найден в БД');
         }
+        
+        console.log('✅ Найден client_id:', clientData.id);
+        
+        // 4. Подготавливаем данные для таблицы works
+        const workData = {
+            client_id: clientData.id,
+            price: AVG_PRICE / 2,
+            is_discounted: true,
+            bonus_applied: false,
+            date: new Date().toISOString()
+        };
+        
+        console.log('📤 Отправляем в works:', workData);
+        
+        // 5. Добавляем запись в таблицу works
+        const { data: workResult, error: workError } = await supabaseClient
+            .from('works')
+            .insert([workData])
+            .select();
+        
+        if (workError) {
+            console.error('❌ Ошибка при добавлении в works:', workError);
+            throw workError;
+        }
+        
+        console.log('✅ Запись добавлена в works:', workResult);
+        
+        showNotification(`Скидка 50% применена к новой работе!`, 'success');
+        
+        renderClientsTable();
+        renderReferrersTable();
+        updateSummaryStats();
+        
+    } catch (err) {
+        console.error('❌ Ошибка при применении скидки:', err);
+        showNotification('Ошибка при сохранении скидки', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+// Функция для просмотра всех работ (можно вызвать из консоли)
+// Функция для просмотра всех работ с именами клиентов
+async function showAllWorks() {
+    try {
+        // Получаем все работы
+        const { data: works, error: worksError } = await supabaseClient
+            .from('works')
+            .select(`
+                *,
+                clients (
+                    name
+                )
+            `)
+            .order('date', { ascending: false });
+        
+        if (worksError) throw worksError;
+        
+        console.log('📋 Все работы:', works);
+        
+        // Форматируем для удобного просмотра
+        const formattedWorks = works.map(w => ({
+            id: w.id,
+            client_name: w.clients?.name || 'Неизвестно',
+            price: w.price,
+            is_discounted: w.is_discounted,
+            bonus_applied: w.bonus_applied,
+            date: new Date(w.date).toLocaleString()
+        }));
+        
+        console.table(formattedWorks);
+        
+        return works;
+        
+    } catch (err) {
+        console.error('❌ Ошибка при загрузке работ:', err);
+    }
+}
 
+
+
+// Делаем функцию доступной глобально
+window.showAllWorks = showAllWorks;
         // ИСПРАВЛЕННАЯ функция добавления работы
-        async function confirmAddWork() {
-            if (!currentUser || currentUser.type !== 'admin' || selectedClientIndex === null) return;
-            
-            const client = data.clients[selectedClientIndex];
-            const price = parseFloat(workPrice.value) || AVG_PRICE;
-            
-            const stats = calculateClientStats(client);
-            
-            if (stats.isDiscountAvailable) {
-                showNotification('Сначала примените скидку! У клиента доступна скидка 50%.', 'error');
-                closeWorkModal();
-                return;
-            }
-            
-            let applyBonusChecked = false;
-            let referrer = null;
-            if (client.referrerId) {
-                referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
-                if (referrer) {
-                    applyBonusChecked = applyBonus.checked;
-                }
-            }
-            
-            const workEntry = {
-                date: new Date().toISOString(),
-                price: price,
-                bonusApplied: applyBonusChecked,
-                isDiscounted: false
-            };
-            
-            showLoading();
-            
-            try {
-                if (!client.workHistory) {
-                    client.workHistory = [];
-                }
-                
-                client.workHistory.push(workEntry);
-                client.paidFull = client.workHistory.filter(w => !w.isDiscounted).length;
-                
-                const { error: clientError } = await supabaseClient
-                    .from('clients')
-                    .update({
-                        work_history: client.workHistory
-                    })
-                    .eq('name', client.name);
-                
-                if (clientError) throw clientError;
-                
-                if (client.referrerId && applyBonusChecked && referrer) {
-                    const bonus = price * (REFERRAL_BONUS_PERCENT / 100);
-                    showNotification(`Рефереру ${referrer.name} начислен бонус ${bonus.toFixed(2)} BYN`, 'success');
-                }
-                
-                renderClientsTable();
-                renderReferrersTable();
-                updateSummaryStats();
-                
-                closeWorkModal();
-                
-                showNotification(`Работа добавлена для ${client.name}`, 'success');
-                
-            } catch (err) {
-                console.error('Ошибка при добавлении работы:', err);
-                showNotification('Ошибка при сохранении работы', 'error');
-            } finally {
-                hideLoading();
-            }
+       
+// ИСПРАВЛЕННАЯ функция добавления работы
+async function confirmAddWork() {
+    if (!currentUser || currentUser.type !== 'admin' || selectedClientIndex === null) return;
+    
+    const client = data.clients[selectedClientIndex];
+    const price = parseFloat(workPrice.value) || AVG_PRICE;
+    
+    const stats = calculateClientStats(client);
+    
+    if (stats.isDiscountAvailable) {
+        showNotification('Сначала примените скидку! У клиента доступна скидка 50%.', 'error');
+        closeWorkModal();
+        return;
+    }
+    
+    let applyBonusChecked = false;
+    let referrer = null;
+    if (client.referrerId) {
+        referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
+        if (referrer) {
+            applyBonusChecked = applyBonus.checked;
         }
+    }
+    
+    const workEntry = {
+        date: new Date().toISOString(),
+        price: price,
+        bonusApplied: applyBonusChecked,
+        isDiscounted: false
+    };
+    
+    showLoading();
+    
+    try {
+        console.log('📝 Добавляем работу для клиента:', client.name);
+        
+        // 1. Добавляем работу в историю клиента
+        if (!client.workHistory) {
+            client.workHistory = [];
+        }
+        
+        client.workHistory.push(workEntry);
+        client.paidFull = client.workHistory.filter(w => !w.isDiscounted).length;
+        
+        // 2. Сохраняем клиента в Supabase
+        const { error: clientError } = await supabaseClient
+            .from('clients')
+            .update({
+                work_history: client.workHistory
+            })
+            .eq('name', client.name);
+        
+        if (clientError) throw clientError;
+        console.log('✅ Клиент обновлен');
+        
+        // 3. Находим ID клиента в базе данных
+        const { data: clientData, error: clientFindError } = await supabaseClient
+            .from('clients')
+            .select('id')
+            .eq('name', client.name)
+            .single();
+        
+        if (clientFindError) throw clientFindError;
+        
+        if (!clientData) {
+            throw new Error('Клиент не найден в БД');
+        }
+        
+        console.log('✅ Найден client_id:', clientData.id);
+        
+        // 4. Подготавливаем данные для таблицы works (с правильными названиями полей!)
+        const workData = {
+            client_id: clientData.id,  // ← ВАЖНО: используем client_id, а не client_name
+            price: price,
+            is_discounted: false,
+            bonus_applied: applyBonusChecked,
+            date: new Date().toISOString()
+        };
+        
+        console.log('📤 Отправляем в works:', workData);
+        
+        // 5. Добавляем запись в таблицу works
+        const { data: workResult, error: workError } = await supabaseClient
+            .from('works')
+            .insert([workData])
+            .select();
+        
+        if (workError) {
+            console.error('❌ Ошибка при добавлении в works:', workError);
+            throw workError;
+        }
+        
+        console.log('✅ Запись добавлена в works:', workResult);
+        
+        // 6. Если нужно начислить бонус рефереру
+        if (client.referrerId && applyBonusChecked && referrer) {
+            const bonus = price * (REFERRAL_BONUS_PERCENT / 100);
+            showNotification(`Рефереру ${referrer.name} начислен бонус ${bonus.toFixed(2)} BYN`, 'success');
+        }
+        
+        renderClientsTable();
+        renderReferrersTable();
+        updateSummaryStats();
+        
+        closeWorkModal();
+        
+        showNotification(`Работа добавлена для ${client.name}`, 'success');
+        
+    } catch (err) {
+        console.error('❌ Ошибка при добавлении работы:', err);
+        console.error('Детали ошибки:', err.message, err.details, err.hint);
+        showNotification('Ошибка при сохранении работы: ' + (err.message || 'неизвестная ошибка'), 'error');
+    } finally {
+        hideLoading();
+    }
+}
 
         function calculateClientBonus(client) {
             if (!client.referrerId) return 0;
@@ -2308,83 +2444,79 @@
         window.copyPasswordToClipboard = copyPasswordToClipboard;
     </script>
 
-    <!-- ===== ПОДКЛЮЧЕНИЕ SUPABASE ===== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <script>
-    // Инициализация Supabase
-    const SUPABASE_URL = 'https://ifodnbfkxucvurjsuwww.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ';
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// Инициализация Supabase
+const SUPABASE_URL = 'https://ifodnbfkxucvurjsuwww.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Загрузка данных из Supabase при старте
+async function loadFromSupabase() {
+    showLoading();
     
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    // Загрузка данных из Supabase при старте
-    async function loadFromSupabase() {
-        showLoading();
+    try {
+        console.log('☁️ Загружаем данные из Supabase...');
         
-        try {
-            console.log('☁️ Загружаем данные из Supabase...');
-            
-            const [referrersRes, clientsRes] = await Promise.all([
-                supabaseClient.from('referrers').select('*'),
-                supabaseClient.from('clients').select('*')
-            ]);
-            
-            if (referrersRes.error) throw referrersRes.error;
-            if (clientsRes.error) throw clientsRes.error;
-            
-            if (referrersRes.data) {
-                data.referrers = referrersRes.data.map(r => ({
-                    name: r.name,
-                    password: r.password,
-                    paidBonus: r.paid_bonus || 0,
-                    id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
-                }));
-                console.log(`✅ Загружено ${referrersRes.data.length} рефереров`);
-            }
-            
-            if (clientsRes.data) {
-                data.clients = clientsRes.data.map(c => ({
-                    name: c.name,
-                    password: c.password,
-                    workHistory: c.work_history || [],
-                    referrerId: c.referrer_id,
-                    paidFull: (c.work_history || []).filter(w => !w.isDiscounted).length
-                }));
-                console.log(`✅ Загружено ${clientsRes.data.length} клиентов`);
-            }
-            
-            updateUserSelect();
-            renderClientsTable();
-            renderReferrersTable();
-            updateSummaryStats();
-            updateReferrerSelect();
-            
-            showNotification('☁️ Данные загружены из облака', 'success');
-            
-        } catch (err) {
-            console.error('❌ Ошибка загрузки из Supabase:', err);
-            showNotification('Ошибка загрузки из облака', 'error');
-        } finally {
-            hideLoading();
+        const [referrersRes, clientsRes] = await Promise.all([
+            supabaseClient.from('referrers').select('*'),
+            supabaseClient.from('clients').select('*')
+        ]);
+        
+        if (referrersRes.error) throw referrersRes.error;
+        if (clientsRes.error) throw clientsRes.error;
+        
+        if (referrersRes.data) {
+            data.referrers = referrersRes.data.map(r => ({
+                name: r.name,
+                password: r.password,
+                paidBonus: r.paid_bonus || 0,
+                id: r.id || String(Date.now()) + String(Math.random()).substring(2, 8)
+            }));
+            console.log(`✅ Загружено ${referrersRes.data.length} рефереров`);
         }
-    }
-    
-    // Загружаем данные при старте
-    document.addEventListener('DOMContentLoaded', function() {
-        loadFromSupabase().then(() => {
-            if (typeof window.initPage === 'function') {
-                window.initPage();
-            }
-        });
         
-        // Автоматическая синхронизация каждые 30 секунд
-        setInterval(() => {
-            if (currentUser && currentUser.type === 'admin') {
-                loadFromSupabase();
-            }
-        }, 30000);
+        if (clientsRes.data) {
+            data.clients = clientsRes.data.map(c => ({
+                name: c.name,
+                password: c.password,
+                workHistory: c.work_history || [],
+                referrerId: c.referrer_id,
+                paidFull: (c.work_history || []).filter(w => !w.isDiscounted).length
+            }));
+            console.log(`✅ Загружено ${clientsRes.data.length} клиентов`);
+        }
+        
+        updateUserSelect();
+        renderClientsTable();
+        renderReferrersTable();
+        updateSummaryStats();
+        updateReferrerSelect();
+        
+        showNotification('☁️ Данные загружены из облака', 'success');
+        
+    } catch (err) {
+        console.error('❌ Ошибка загрузки из Supabase:', err);
+        showNotification('Ошибка загрузки из облака', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Убираем автосинхронизацию - оставляем только ручную при действиях
+// setInterval больше НЕ НУЖЕН
+
+// Загружаем данные только при старте
+document.addEventListener('DOMContentLoaded', function() {
+    loadFromSupabase().then(() => {
+        if (typeof window.initPage === 'function') {
+            window.initPage();
+        }
     });
-    </script>
+});
+</script>
 </body>
 </html>

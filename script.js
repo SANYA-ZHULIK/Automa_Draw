@@ -11,6 +11,8 @@ const AUTH_KEY = 'currentUser';
 const DISCOUNT_CYCLE = 9;
 const REFERRAL_BONUS_PERCENT = 10;
 const AVG_PRICE = 20;
+// Получаем элемент футера со статистикой
+const adminFooterStats = document.getElementById('adminFooterStats');
 
 // Текущий пользователь
 let currentUser = JSON.parse(sessionStorage.getItem(AUTH_KEY)) || null;
@@ -174,6 +176,9 @@ function showAuthScreen() {
     referrersTableContainer.classList.add('hidden');
     personalView.classList.add('hidden');
     
+    // Скрываем статистику в футере
+    hideAdminFooterStats();
+    
     updateUserSelect();
 }
 
@@ -201,6 +206,9 @@ function enterAdminMode() {
     renderClientsTable();
     renderReferrersTable();
     updateSummaryStats();
+    
+    // Показываем статистику в футере для админа
+    showAdminFooterStats();
 }
 
 function enterUserMode(user) {
@@ -213,6 +221,9 @@ function enterUserMode(user) {
     clientsTableContainer.classList.add('hidden');
     referrersTableContainer.classList.add('hidden');
     personalView.classList.remove('hidden');
+    
+    // Скрываем статистику в футере для обычных пользователей
+    hideAdminFooterStats();
     
     if (user.type === 'client') {
         modeText.innerHTML = `<span>👤</span> Вы вошли как клиент: ${user.name}`;
@@ -719,6 +730,21 @@ function updateSummaryStats() {
                 <div class="summary-label">К выплате</div>
             </div>
         `;
+    }
+}
+// Показать статистику в футере для админа
+function showAdminFooterStats() {
+    const adminFooter = document.getElementById('adminFooterStats');
+    if (adminFooter) {
+        adminFooter.classList.remove('hidden');
+    }
+}
+
+// Скрыть статистику в футере
+function hideAdminFooterStats() {
+    const adminFooter = document.getElementById('adminFooterStats');
+    if (adminFooter) {
+        adminFooter.classList.add('hidden');
     }
 }
 

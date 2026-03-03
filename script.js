@@ -193,7 +193,7 @@ function initPage() {
 function updateUserSelect() {
     if (!userSelect) return;
     
-    userSelect.innerHTML = '<option value="">👤 Выберите пользователя</option>';
+    userSelect.innerHTML = '<option value="">Выберите пользователя</option>';
     
     data.clients.forEach((client, index) => {
         if (client.password) {

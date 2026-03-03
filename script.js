@@ -62,28 +62,26 @@ const applyBonus = document.getElementById('applyBonus');
 const bonusAmount = document.getElementById('bonusAmount');
 const bonusCheckboxContainer = document.getElementById('bonusCheckboxContainer');
 
+// === ПРИНУДИТЕЛЬНОЕ СКРЫТИЕ ВСЕХ ПАНЕЛЕЙ ПРИ ЗАГРУЗКЕ ===
+(function() {
+    // Скрываем все панели сразу после загрузки DOM
+    setTimeout(function() {
+        console.log('🔒 Принудительно скрываем все панели');
+        
+        if (clientsTableContainer) clientsTableContainer.classList.add('hidden');
+        if (referrersTableContainer) referrersTableContainer.classList.add('hidden');
+        if (editControlsClients) editControlsClients.classList.add('hidden');
+        if (editControlsReferrers) editControlsReferrers.classList.add('hidden');
+        if (personalView) personalView.classList.add('hidden');
+        
+        const tabs = document.querySelector('.tabs');
+        if (tabs) tabs.classList.add('hidden');
+        
+        if (adminFooterStats) adminFooterStats.classList.add('hidden');
+        if (summaryStats) summaryStats.classList.add('hidden');
+    }, 10);
+})();
 
-// Проверка наличия всех необходимых элементов
-console.log('📋 Элементы страницы:', {
-    adminFooterStats: adminFooterStats ? '✅' : '❌',
-    summaryStats: summaryStats ? '✅' : '❌',
-    tableBody: tableBody ? '✅' : '❌',
-    authSection: authSection ? '✅' : '❌',
-    modeIndicator: modeIndicator ? '✅' : '❌',
-    modeText: modeText ? '✅' : '❌',
-    editControlsClients: editControlsClients ? '✅' : '❌',
-    editControlsReferrers: editControlsReferrers ? '✅' : '❌'
-});
-
-// Если adminFooterStats не найден, создай предупреждение
-if (!adminFooterStats) {
-    console.warn('⚠️ adminFooterStats не найден! Статистика в футере не будет работать.');
-}
-
-// Если summaryStats не найден, создай предупреждение
-if (!summaryStats) {
-    console.warn('⚠️ summaryStats не найден!');
-}
 // === ФУНКЦИИ ДЛЯ ИНДИКАТОРА ЗАГРУЗКИ ===
 function showLoading() {
     if (loadingIndicator) loadingIndicator.style.display = 'block';
@@ -163,29 +161,38 @@ async function updateClientStats(client) {
 
 // === ОСНОВНЫЕ ФУНКЦИИ ===
 function initPage() {
+    console.log('🚀 initPage() вызван, currentUser:', currentUser);
+    
     // Скрываем все таблицы и панели при загрузке
     clientsTableContainer.classList.add('hidden');
     referrersTableContainer.classList.add('hidden');
     editControlsClients.classList.add('hidden');
     editControlsReferrers.classList.add('hidden');
     personalView.classList.add('hidden');
-    document.querySelector('.tabs').classList.add('hidden');
+    
+    const tabs = document.querySelector('.tabs');
+    if (tabs) tabs.classList.add('hidden');
+    
     hideAdminFooterStats();
     
     updateUserSelect();
     
     if (currentUser) {
+        console.log('👤 Пользователь найден в sessionStorage:', currentUser);
         if (currentUser.type === 'admin') {
             enterAdminMode();
         } else {
             enterUserMode(currentUser);
         }
     } else {
+        console.log('👤 Пользователь не найден, показываем форму входа');
         showAuthScreen();
     }
 }
 
 function updateUserSelect() {
+    if (!userSelect) return;
+    
     userSelect.innerHTML = '<option value="">👤 Выберите пользователя</option>';
     
     data.clients.forEach((client, index) => {
@@ -212,7 +219,9 @@ function showAuthScreen() {
     modeIndicator.className = 'mode-indicator view-mode';
     modeText.textContent = 'Режим просмотра • Войдите в систему';
     
-    document.querySelector('.tabs').classList.add('hidden');
+    const tabs = document.querySelector('.tabs');
+    if (tabs) tabs.classList.add('hidden');
+    
     editControlsClients.classList.add('hidden');
     editControlsReferrers.classList.add('hidden');
     clientsTableContainer.classList.add('hidden');
@@ -226,11 +235,15 @@ function showAuthScreen() {
 }
 
 function enterAdminMode() {
+    console.log('👑 Вход в режим администратора');
+    
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator edit-mode';
     modeText.innerHTML = '<span>✏️</span> Режим администратора • Полный доступ';
     
-    document.querySelector('.tabs').classList.remove('hidden');
+    const tabs = document.querySelector('.tabs');
+    if (tabs) tabs.classList.remove('hidden');
+    
     personalView.classList.add('hidden');
     
     if (currentTab === 'clients') {
@@ -249,20 +262,21 @@ function enterAdminMode() {
     renderClientsTable();
     renderReferrersTable();
     
-    // ВАЖНО: Проверяем, что adminFooterStats существует перед вызовом
     if (adminFooterStats) {
         updateSummaryStats();
         showAdminFooterStats();
-    } else {
-        console.warn('⚠️ adminFooterStats не найден, статистика не показана');
     }
 }
 
 function enterUserMode(user) {
+    console.log('👤 Вход в режим пользователя:', user);
+    
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator view-mode';
     
-    document.querySelector('.tabs').classList.add('hidden');
+    const tabs = document.querySelector('.tabs');
+    if (tabs) tabs.classList.add('hidden');
+    
     editControlsClients.classList.add('hidden');
     editControlsReferrers.classList.add('hidden');
     clientsTableContainer.classList.add('hidden');
@@ -411,7 +425,7 @@ function login() {
     const [type, index] = selectedUser.split('_');
     const userData = type === 'client' ? data.clients[parseInt(index)] : data.referrers[parseInt(index)];
     
-    if (userData.password === password) {
+    if (userData && userData.password === password) {
         currentUser = { 
             type: type, 
             index: parseInt(index), 
@@ -667,7 +681,6 @@ async function confirmAddWork() {
         
     } catch (err) {
         console.error('❌ Ошибка при добавлении работы:', err);
-        console.error('Детали ошибки:', err.message, err.details, err.hint);
         showNotification('Ошибка при сохранении работы: ' + (err.message || 'неизвестная ошибка'), 'error');
     } finally {
         hideLoading();
@@ -789,6 +802,8 @@ function updateSummaryStats() {
 }
 
 function updateReferrerSelect() {
+    if (!referrerSelect) return;
+    
     referrerSelect.innerHTML = '<option value="">— Не привели (сам пришел) —</option>';
     
     data.referrers.forEach((referrer) => {
@@ -1421,21 +1436,31 @@ function loadFromSupabase() {
                 console.log('✅ Загружено ' + response.data.length + ' клиентов');
             }
             
-            // Обновляем интерфейс
-            updateUserSelect();
-            renderClientsTable();
-            renderReferrersTable();
-            
-            // ВАЖНО: Проверяем, что adminFooterStats существует перед вызовом
-            if (adminFooterStats) {
-                updateSummaryStats();
+            // Обновляем интерфейс ТОЛЬКО если пользователь уже вошел
+            if (currentUser) {
+                console.log('👤 Пользователь уже в системе, обновляем интерфейс');
+                updateUserSelect();
+                renderClientsTable();
+                renderReferrersTable();
+                
+                if (adminFooterStats) {
+                    updateSummaryStats();
+                }
+                
+                updateReferrerSelect();
+                
+                // Показываем нужный режим
+                if (currentUser.type === 'admin') {
+                    enterAdminMode();
+                } else {
+                    enterUserMode(currentUser);
+                }
             } else {
-                console.warn('⚠️ adminFooterStats не найден, статистика не обновлена');
+                console.log('👤 Пользователь не в системе, просто обновляем селект');
+                updateUserSelect();
+                // Показываем форму входа
+                showAuthScreen();
             }
-            
-            updateReferrerSelect();
-            
-            showNotification('☁️ Данные загружены из облака', 'success');
             
             hideLoading();
         })
@@ -1448,11 +1473,25 @@ function loadFromSupabase() {
 
 // === ИНИЦИАЛИЗАЦИЯ ===
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM загружен, начинаем инициализацию');
+    
+    // Сначала принудительно скрываем всё
+    if (clientsTableContainer) clientsTableContainer.classList.add('hidden');
+    if (referrersTableContainer) referrersTableContainer.classList.add('hidden');
+    if (editControlsClients) editControlsClients.classList.add('hidden');
+    if (editControlsReferrers) editControlsReferrers.classList.add('hidden');
+    if (personalView) personalView.classList.add('hidden');
+    
+    const tabs = document.querySelector('.tabs');
+    if (tabs) tabs.classList.add('hidden');
+    
+    if (adminFooterStats) adminFooterStats.classList.add('hidden');
+    
+    // Показываем форму входа
+    if (authSection) authSection.classList.remove('hidden');
+    
     // Загружаем данные
-    loadFromSupabase().then(() => {
-        // Инициализируем страницу
-        initPage();
-    });
+    loadFromSupabase();
 });
 
 // Обработчики для модального окна

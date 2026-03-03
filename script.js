@@ -704,8 +704,14 @@ function updateSummaryStats() {
         totalPaidBonus += stats.paidBonus;
     });
     
+    // ✅ ИСПРАВЛЕНО: используем adminFooterStats вместо summaryStats
+    if (!adminFooterStats) {
+        console.warn('adminFooterStats не найден в DOM');
+        return;
+    }
+    
     if (currentTab === 'clients') {
-        summaryStats.innerHTML = `
+        adminFooterStats.innerHTML = `
             <div class="summary-stat">
                 <div class="summary-value">${totalClients}</div>
                 <div class="summary-label">Клиентов</div>
@@ -724,7 +730,7 @@ function updateSummaryStats() {
             </div>
         `;
     } else {
-        summaryStats.innerHTML = `
+        adminFooterStats.innerHTML = `
             <div class="summary-stat">
                 <div class="summary-value">${totalReferrers}</div>
                 <div class="summary-label">Рефереров</div>

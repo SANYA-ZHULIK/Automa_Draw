@@ -239,7 +239,7 @@ function enterAdminMode() {
     
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator edit-mode';
-    modeText.innerHTML = '<span>✏️</span> Режим администратора • Полный доступ';
+    modeText.innerHTML = '<Режим администратора • Полный доступ';
     
     const tabs = document.querySelector('.tabs');
     if (tabs) tabs.classList.remove('hidden');
@@ -1367,7 +1367,7 @@ async function showAllStats() {
         
         if (error) throw error;
         
-        console.log('📊 Статистика клиентов:');
+        console.log('Статистика клиентов:');
         console.table(stats.map(s => ({
             'Клиент': s.client_name,
             'Всего работ': s.total_works,

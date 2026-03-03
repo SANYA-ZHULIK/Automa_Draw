@@ -20,52 +20,50 @@
     
     <!-- Подключаем CSS -->
     <link rel="stylesheet" href="style.css">
+    
+    
 </head>
 <body>
     <!-- Индикатор загрузки -->
     <div class="loading-indicator" id="loadingIndicator">
-        <span>⚡</span> Загрузка данных...
+         Загрузка данных...
     </div>
 
     <div class="container">
-        <!-- ШАПКА САЙТА с логотипом -->
+        <!-- ШАПКА САЙТА В СТИЛЕ МАКЕТА - БЕЗ ОТСТУПОВ -->
         <div class="header">
-            <div class="header-top">
-                <div class="logo-area" style="display: flex; align-items: center; gap: 0;">
-    <!-- Логотип AutomaDraw -->
-    <img src="autodraw_logo copy.png" alt="AutomaDraw Logo" style="width: 120px; height: 120px; padding: 0; background: transparent; margin-right: -15px;">
-    <div class="logo-text" style="margin-left: 8px;">
-        <h1 style="margin: 0; line-height: 1.2;">AutomaDraw</h1>
-        <span class="logo-badge" style="margin-top: 0;">Учёт работ</span>
-    </div>
-</div>
-                <div class="header-stats" id="headerStats">
-                    <div class="header-stat">
-                        <span class="stat-icon">👥</span>
-                        <span class="stat-count" id="headerClientsCount">0</span>
-                    </div>
-                    <div class="header-stat">
-                        <span class="stat-icon">📋</span>
-                        <span class="stat-count" id="headerWorksCount">0</span>
-                    </div>
-                    <div class="header-stat">
-                        <span class="stat-icon">🤝</span>
-                        <span class="stat-count" id="headerReferrersCount">0</span>
+            <!-- Навигационная панель -->
+            <div class="navbar">
+                <div class="logo-area">
+                    <!-- Логотип AutomaDraw -->
+                    <img src="autodraw_logo copy.png" alt="AutomaDraw Logo">
+                    <div class="logo-text">
+                        <h1>AutomaDraw</h1>
+                        <span class="logo-badge">Учёт работ</span>
                     </div>
                 </div>
+                
+                <div class="nav-links">
+                    <a href="#" class="nav-link">СКИДКА 50%</a>
+                    <a href="#" class="nav-link">БОНУС РЕФЕРУ</a>
+                    <a href="#" class="nav-link">НИЗКАЯ ЦЕНА</a>
+                    <a href="#" class="nav-link">ЛУЧШИЙ СЕРВИС</a>
+                </div>
+                
+                <a href="#" class="get-the-new" onclick="event.preventDefault(); document.getElementById('authSection').scrollIntoView({behavior: 'smooth'});">ВОЙТИ</a>
             </div>
             
-            <div class="header-main">
-                <h2>Учет работ + Реферальная система</h2>
-                <div class="header-features">
-                    <span class="feature-badge">🎯 Скидка каждую 10-ю работу</span>
-                    <span class="feature-badge">💰 Бонус рефереру 10%</span>
-                    <span class="feature-badge">💵 Цена: 20–25 BYN</span>
+            <!-- Hero секция -->
+            <div class="hero-section">
+                <div class="hero-text">
+                    <h1>Учет работ + Реферальная система</h1>
+                    <p>Скидка каждую 10-ю работу • Бонус рефереру 10% • Цена: 20–25 BYN</p>
                 </div>
+                
             </div>
             
             <div class="header-wave">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
                     <path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,170.7C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
                 </svg>
             </div>
@@ -75,14 +73,14 @@
         <div class="auth-section" id="authSection">
             <div class="auth-panel-simple">
                 <div class="auth-title">
-                    <span>🔐</span>
+                    
                     <span>Вход в систему</span>
                 </div>
 
                 <!-- Выбор пользователя -->
                 <div class="user-selector">
                     <select class="form-control" id="userSelect">
-                        <option value="">👤 Выберите пользователя</option>
+                        <option value="">Выберите пользователя</option>
                     </select>
                 </div>
 
@@ -92,28 +90,28 @@
                            onkeypress="handlePasswordEnter(event)">
                 </div>
                 <button class="btn btn-primary" onclick="login()">
-                    🔓 Войти
+                    Войти
                 </button>
                 
                 <div class="auth-note">
-                    <div style="margin-top: 5px; font-size: 0.85rem;">🔑 Пароль выдает администратор</div>
+                    <div style="margin-top: 5px; font-size: 0.85rem;">Пароль выдает администратор</div>
                 </div>
             </div>
         </div>
 
         <!-- Индикатор режима и пользователя -->
         <div id="modeIndicator" class="mode-indicator view-mode">
-            <span>👁️</span>
+            
             <span id="modeText">Режим просмотра • Войдите в систему</span>
         </div>
 
         <!-- Вкладки (видны только админу) -->
         <div class="tabs" id="tabs">
             <button class="tab active" onclick="switchTab('clients')" id="tabClients">
-                <span>👥</span> Клиенты
+                <span></span> Клиенты
             </button>
             <button class="tab" onclick="switchTab('referrers')" id="tabReferrers">
-                <span>🤝</span> Рефереры
+                <span></span> Рефереры
             </button>
         </div>
 
@@ -131,7 +129,7 @@
                     <span>➕</span> Добавить клиента
                 </button>
                 <button class="btn btn-secondary" onclick="logout()">
-                    <span>🚪</span> Выйти
+                    <span></span> Выйти
                 </button>
             </div>
         </div>
@@ -148,7 +146,7 @@
                     <span>➕</span> Добавить реферера
                 </button>
                 <button class="btn btn-secondary" onclick="logout()">
-                    <span>🚪</span> Выйти
+                     Выйти
                 </button>
             </div>
         </div>
@@ -204,7 +202,7 @@
         <div id="personalView" class="hidden">
             <div class="table-container">
                 <div style="padding: 30px; text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 20px;">👤</div>
+                    <div style="font-size: 2rem; margin-bottom: 20px;"></div>
                     <h2 id="personalName"></h2>
                     <div id="personalStats" style="margin: 30px 0;"></div>
                     <button class="btn btn-secondary" onclick="logout()">Выйти</button>
@@ -243,7 +241,7 @@
                         <span>Начислить бонус рефереру (10%)</span>
                     </label>
                     <div id="bonusAmount" class="bonus-info" style="background: var(--info-light); padding: 12px; border-radius: 12px; margin: 12px 0; font-weight: 600;">
-                        💰 Бонус: 2.00 BYN
+                        Бонус: 2.00 BYN
                     </div>
                 </div>
             </div>

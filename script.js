@@ -11,8 +11,6 @@ const AUTH_KEY = 'currentUser';
 const DISCOUNT_CYCLE = 9;
 const REFERRAL_BONUS_PERCENT = 10;
 const AVG_PRICE = 20;
-// Получаем элемент футера со статистикой
-const adminFooterStats = document.getElementById('adminFooterStats');
 
 // Текущий пользователь
 let currentUser = JSON.parse(sessionStorage.getItem(AUTH_KEY)) || null;
@@ -45,6 +43,7 @@ const referrerNameInput = document.getElementById('referrerNameInput');
 const referrerPasswordInput = document.getElementById('referrerPasswordInput');
 const referrerSelect = document.getElementById('referrerSelect');
 const summaryStats = document.getElementById('summaryStats');
+const adminFooterStats = document.getElementById('adminFooterStats');
 const tabClients = document.getElementById('tabClients');
 const tabReferrers = document.getElementById('tabReferrers');
 const userSelect = document.getElementById('userSelect');
@@ -70,6 +69,19 @@ function showLoading() {
 
 function hideLoading() {
     if (loadingIndicator) loadingIndicator.style.display = 'none';
+}
+
+// === ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ ВИДИМОСТЬЮ СТАТИСТИКИ ===
+function showAdminFooterStats() {
+    if (adminFooterStats) {
+        adminFooterStats.classList.remove('hidden');
+    }
+}
+
+function hideAdminFooterStats() {
+    if (adminFooterStats) {
+        adminFooterStats.classList.add('hidden');
+    }
 }
 
 // === ФУНКЦИИ ДЛЯ РАБОТЫ СО СТАТИСТИКОЙ ===
@@ -730,21 +742,6 @@ function updateSummaryStats() {
                 <div class="summary-label">К выплате</div>
             </div>
         `;
-    }
-}
-// Показать статистику в футере для админа
-function showAdminFooterStats() {
-    const adminFooter = document.getElementById('adminFooterStats');
-    if (adminFooter) {
-        adminFooter.classList.remove('hidden');
-    }
-}
-
-// Скрыть статистику в футере
-function hideAdminFooterStats() {
-    const adminFooter = document.getElementById('adminFooterStats');
-    if (adminFooter) {
-        adminFooter.classList.add('hidden');
     }
 }
 

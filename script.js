@@ -293,10 +293,10 @@ function enterUserMode(user) {
     hideAdminFooterStats();
     
     if (user.type === 'client') {
-        modeText.innerHTML = `<span>👤</span> Вы вошли как клиент: ${user.name}`;
+        modeText.innerHTML = `Вы вошли как клиент ${user.name}`;
         showClientPersonalView(user.index);
     } else if (user.type === 'referrer') {
-        modeText.innerHTML = `<span>🤝</span> Вы вошли как реферер: ${user.name}`;
+        modeText.innerHTML = `Вы вошли как реферер ${user.name}`;
         showReferrerPersonalView(user.index);
     }
 }
@@ -304,105 +304,195 @@ function enterUserMode(user) {
 function showClientPersonalView(clientIndex) {
     const client = data.clients[clientIndex];
     personalName.textContent = client.name;
+    personalName.style.textAlign = 'center';
+    personalName.style.marginBottom = '30px';
     
     const stats = calculateClientStats(client);
     const referrer = client.referrerId ? data.referrers.find(r => String(r.id) === String(client.referrerId)) : null;
     
-    let historyHtml = '';
-    if (client.workHistory && client.workHistory.length > 0) {
-        historyHtml = '<h3 style="margin-top: 30px;">История работ</h3><div style="overflow-x: auto;"><table style="width: 100%; margin-top: 20px;"><tr><th>Дата</th><th>Цена</th><th>Тип</th></tr>';
-        
-        const sortedWorks = [...client.workHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sortedWorks.forEach(work => {
-            const date = new Date(work.date).toLocaleDateString();
-            const type = work.isDiscounted ? 'Со скидкой 50%' : 'Полная цена';
-            historyHtml += `<tr><td>${date}</td><td>${work.price} BYN</td><td>${type}</td></tr>`;
-        });
-        historyHtml += '</table></div>';
-    }
-    
-    personalStats.innerHTML = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            <div class="stat-card">
-                <div class="stat-value">${stats.totalWorks}</div>
-                <div class="stat-label">Всего работ</div>
+    // Статистика клиента
+    const statsHtml = `
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 30px;">
+            <div class="stat-card" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">ВСЕГО РАБОТ</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">${stats.totalPaid}</div>
-                <div class="stat-label">По полной</div>
+            <div class="stat-card" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #2c3e50;">${stats.totalPaid}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">ПО ПОЛНОЙ</div>
             </div>
-            <div class="stat-card discount-stat">
-                <div class="stat-value">${stats.discountCount}</div>
-                <div class="stat-label">Со скидкой</div>
+            <div class="stat-card discount-stat" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #2c3e50;">${stats.discountCount}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">СО СКИДКОЙ</div>
             </div>
         </div>
-        
-        <div style="margin: 30px 0;">
-            <h3>Прогресс до следующей скидки</h3>
-            <div class="progress-container" style="max-width: 400px; margin: 20px auto;">
-                <div class="progress-info">
-                    <span>${stats.paidInCycle}/9 работ</span>
-                    <span>${Math.round(stats.progressPercent)}%</span>
+    `;
+    
+    // Прогресс до скидки
+    const progressHtml = `
+        <div style="margin: 30px auto; text-align: center; max-width: 500px;">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">Прогресс до следующей скидки</h3>
+            <div class="progress-container" style="width: 100%;">
+                <div class="progress-info" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-weight: 600;">${stats.paidInCycle}/9 работ</span>
+                    <span style="color: #7f8c8d;">${Math.round(stats.progressPercent)}%</span>
                 </div>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar" style="width: ${stats.progressPercent}%"></div>
+                <div class="progress-bar-bg" style="height: 10px; background: #ecf0f1; border-radius: 10px; overflow: hidden;">
+                    <div class="progress-bar" style="height: 100%; width: ${stats.progressPercent}%; background: linear-gradient(90deg, #6b6b6b, #b2b2b2);"></div>
                 </div>
             </div>
             ${stats.isDiscountAvailable ? 
-                '<p style="color: #27ae60; margin-top: 15px; font-weight: 600;">✅ Скидка 50% доступна! Обратитесь к администратору.</p>' : 
-                `<p style="color: #e67e22;">Осталось оплаченных работ до скидки: ${stats.worksUntilDiscount}</p>`
+                '<p style="color: #27ae60; margin-top: 15px; font-weight: 600;">Скидка 50% доступна! Обратитесь к администратору.</p>' : 
+                `<p style="color: #e67e22; margin-top: 15px;">Осталось работ: ${stats.worksUntilDiscount}</p>`
             }
         </div>
-        
-        ${referrer ? `<p style="margin-top: 20px;"> Вас привел: <strong>${referrer.name}</strong></p>` : ''}
-        
-        ${historyHtml}
     `;
+    
+    // Информация о реферере
+    const referrerHtml = referrer ? 
+        `<p style="margin: 20px auto; text-align: center;">Вас привел: <strong style="color: #6b6b6b;">${referrer.name}</strong></p>` : 
+        '';
+    
+    // История работ - ВСЕГДА ПОКАЗЫВАЕМ ТАБЛИЦУ
+    const sortedWorks = client.workHistory && client.workHistory.length > 0 
+        ? [...client.workHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
+        : [];
+    
+    let historyRows = '';
+    if (sortedWorks.length > 0) {
+        sortedWorks.forEach(work => {
+            const date = new Date(work.date).toLocaleDateString('ru-RU');
+            const type = work.isDiscounted ? 
+                '<span style="color: #f39c12; font-weight: 600;">Со скидкой 50%</span>' : 
+                '<span style="color: #27ae60; font-weight: 600;">Полная цена</span>';
+            
+            historyRows += `
+                <tr style="border-bottom: 1px solid #eaeaea;">
+                    <td style="padding: 12px 15px; text-align: center;">${date}</td>
+                    <td style="padding: 12px 15px; text-align: center; font-weight: 600;">${work.price} BYN</td>
+                    <td style="padding: 12px 15px; text-align: center;">${type}</td>
+                </tr>
+            `;
+        });
+    } else {
+        // Пустая строка для отображения
+        historyRows = `
+            <tr>
+                <td colspan="3" style="padding: 40px; text-align: center; color: #95a5a6;">
+                    📭 Пока нет выполненных работ
+                </td>
+            </tr>
+        `;
+    }
+    
+    const historyHtml = `
+        <h3 style="margin: 40px auto 20px; text-align: center; color: #2c3e50;">История работ</h3>
+        <div style="overflow-x: auto; display: flex; justify-content: center;">
+            <table style="width: 100%; max-width: 800px; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 0 auto;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Дата</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Цена</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Тип</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${historyRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    personalStats.innerHTML = statsHtml + progressHtml + referrerHtml + historyHtml;
 }
 
 function showReferrerPersonalView(referrerIndex) {
     const referrer = data.referrers[referrerIndex];
     personalName.textContent = referrer.name;
+    personalName.style.textAlign = 'center';
+    personalName.style.marginBottom = '30px';
     
     const stats = calculateReferrerStats(referrer.id);
     
+    // Статистика реферера
+    const statsHtml = `
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 30px;">
+            <div class="stat-card" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #2c3e50;">${stats.clientsCount}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">КЛИЕНТОВ</div>
+            </div>
+            <div class="stat-card" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">РАБОТ</div>
+            </div>
+            <div class="stat-card bonus-stat" style="text-align: center; padding: 20px; min-width: 200px;">
+                <div class="stat-value" style="font-size: 2rem; font-weight: 800; color: #3498db;">${stats.totalBonus.toFixed(2)} BYN</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">БОНУСОВ</div>
+            </div>
+        </div>
+    `;
+    
+    // Статус выплат
+    const payoutHtml = `
+        <div style="background: #e8f5e9; padding: 25px; border-radius: 16px; margin: 30px auto; max-width: 600px; text-align: center;">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">Статус выплат</h3>
+            <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #27ae60;">${stats.paidBonus.toFixed(2)} BYN</div>
+                    <div style="color: #7f8c8d; margin-top: 5px;">Выплачено</div>
+                </div>
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #e67e22;">${stats.toPay.toFixed(2)} BYN</div>
+                    <div style="color: #7f8c8d; margin-top: 5px;">К выплате</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Приведенные клиенты - ВСЕГДА ПОКАЗЫВАЕМ ТАБЛИЦУ
     const referredClients = data.clients.filter(c => String(c.referrerId) === String(referrer.id));
     
-    let clientsHtml = '';
+    let clientRows = '';
     if (referredClients.length > 0) {
-        clientsHtml = '<h3 style="margin-top: 30px;">Приведенные клиенты</h3><div style="overflow-x: auto;"><table style="width: 100%; margin-top: 20px;"><tr><th>Клиент</th><th>Работ</th><th>Бонусов</th></tr>';
-        
         referredClients.forEach(client => {
             const clientBonus = calculateClientBonus(client);
-            clientsHtml += `<tr><td>${client.name}</td><td>${(client.workHistory || []).length}</td><td>${clientBonus.toFixed(2)} BYN</td></tr>`;
+            clientRows += `
+                <tr style="border-bottom: 1px solid #eaeaea;">
+                    <td style="padding: 12px 15px; text-align: center; font-weight: 500;">${client.name}</td>
+                    <td style="padding: 12px 15px; text-align: center;">${(client.workHistory || []).length}</td>
+                    <td style="padding: 12px 15px; text-align: center; font-weight: 600; color: #27ae60;">${clientBonus.toFixed(2)} BYN</td>
+                </tr>
+            `;
         });
-        clientsHtml += '</table></div>';
+    } else {
+        clientRows = `
+            <tr>
+                <td colspan="3" style="padding: 40px; text-align: center; color: #95a5a6;">
+                    У вас пока нет приведенных клиентов
+                </td>
+            </tr>
+        `;
     }
     
-    personalStats.innerHTML = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            <div class="stat-card">
-                <div class="stat-value">${stats.clientsCount}</div>
-                <div class="stat-label">Клиентов</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${stats.totalWorks}</div>
-                <div class="stat-label">Работ</div>
-            </div>
-            <div class="stat-card bonus-stat">
-                <div class="stat-value">${stats.totalBonus.toFixed(2)} BYN</div>
-                <div class="stat-label">Бонусов</div>
-            </div>
+    const clientsHtml = `
+        <h3 style="margin: 40px auto 20px; text-align: center; color: #2c3e50;">Приведенные клиенты</h3>
+        <div style="overflow-x: auto; display: flex; justify-content: center;">
+            <table style="width: 100%; max-width: 800px; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 0 auto;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Клиент</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Работ</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Бонусов</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${clientRows}
+                </tbody>
+            </table>
         </div>
-        
-        <div style="background: #e8f5e9; padding: 20px; border-radius: 16px; margin: 20px 0;">
-            <h3>Статус выплат</h3>
-            <p style="font-size: 1.2rem;"> Выплачено: <strong>${stats.paidBonus.toFixed(2)} BYN</strong></p>
-            <p style="font-size: 1.2rem;"> К выплате: <strong>${stats.toPay.toFixed(2)} BYN</strong></p>
-        </div>
-        
-        ${clientsHtml}
     `;
+    
+    personalStats.innerHTML = statsHtml + payoutHtml + clientsHtml;
 }
 
 function login() {
@@ -878,34 +968,35 @@ function renderClientsTable() {
     data.clients.forEach((client, index) => {
         const stats = calculateClientStats(client);
         
+        // 2. Убрал снизу фамилии надпись "привел"
         let referrerInfo = '<span style="color: #95a5a6;">—</span>';
         
         if (client.referrerId) {
             const referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));
             if (referrer) {
                 referrerInfo = `
-                    <div class="client-name" style="font-size: 1rem; color: #2980b9;">${referrer.name}</div>
-                    <div class="referrer-badge badge badge-referrer">привел</div>
+                    <div style="color: #7f8c8d; font-weight: 500;">${referrer.name}</div>
                 `;
             } else {
                 client.referrerId = null;
             }
         }
         
+        // 3 и 4. Статус с серым цветом текста
         let statusHtml;
         if (stats.isDiscountAvailable) {
             statusHtml = `
-                <div class="discount-indicator discount-available">
-                    Скидка готова!
-                    <button class="action-btn action-discount" onclick="applyDiscount(${index})" style="margin-left: 10px; padding: 4px 8px; min-width: auto;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <span style="color: #2acf18; font-weight: 500;">Скидка готова!</span>
+                    <button class="action-btn action-discount" onclick="applyDiscount(${index})" style="margin-left: 0; padding: 6px 12px; min-width: auto; background: #7f8c8d; color: white; border: none; border-radius: 30px; cursor: pointer;">
                         Применить 50%
                     </button>
                 </div>
             `;
         } else {
             statusHtml = `
-                <div class="discount-indicator discount-pending">
-                    Нужно еще работ до получения скидки: ${stats.worksUntilDiscount} 
+                <div style="color: #7f8c8d; font-weight: 500; text-align: center;">
+                    Нужно еще работ до получения скидки: ${stats.worksUntilDiscount}
                 </div>
             `;
         }
@@ -923,7 +1014,7 @@ function renderClientsTable() {
         `;
         
         const passwordHtml = `
-            <div class="password-cell">
+            <div class="password-cell" style="text-align: center;">
                 ${client.password ? 
                     `<button class="btn btn-info btn-sm" onclick="showPassword('${client.password}', '${client.name}', 'client')" style="padding: 5px 10px; font-size: 0.8rem; border-radius: 20px;">
                          Показать
@@ -934,7 +1025,7 @@ function renderClientsTable() {
         `;
         
         const actionsHtml = `
-            <div class="actions">
+            <div class="actions" style="justify-content: center;">
                 <button class="action-btn action-add" onclick="openWorkModal(${index})" title="Добавить работу">
                     <span>➕</span>
                 </button>
@@ -946,32 +1037,36 @@ function renderClientsTable() {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td class="client-info">
+            <td class="client-info" style="text-align: left;">
                 <div class="client-name">${client.name}</div>
                 <div class="client-id">ID: ${String(index + 1).padStart(3, '0')}</div>
             </td>
-            <td>${passwordHtml}</td>
-            <td>
-                <div class="stat-card">
+            <td style="text-align: center;">${passwordHtml}</td>
+            <td style="text-align: center;">
+                <div class="stat-card" style="display: inline-block;">
                     <div class="stat-value">${stats.totalWorks}</div>
                 </div>
             </td>
-            <td>
-                <div class="stat-card">
+            <!-- 1. Центровка для графы "по полной" -->
+            <td style="text-align: center;">
+                <div class="stat-card" style="display: inline-block;">
                     <div class="stat-value">${stats.totalPaid}</div>
                 </div>
             </td>
-            <td>
-                <div class="stat-card discount-stat">
-                    <div class="stat-value">${stats.discountCount}</div>
-                </div>
-            </td>
-            <td>
+            <td style="text-align: center;">
+    <div class="stat-card discount-stat" style="display: inline-block; ${stats.discountCount === 0 ? 'opacity: 0.6;' : ''}">
+        <div class="stat-value">${stats.discountCount}</div>
+    </div>
+</td>
+            <td style="text-align: center;">
                 ${referrerInfo}
             </td>
-            <td>${statusHtml}</td>
-            <td>${progressHtml}</td>
-            <td>${actionsHtml}</td>
+            <!-- 3. Центровка для графы "статус" -->
+            <td style="text-align: center; vertical-align: middle;">
+                ${statusHtml}
+            </td>
+            <td style="text-align: center;">${progressHtml}</td>
+            <td style="text-align: center;">${actionsHtml}</td>
         `;
 
         tableBody.appendChild(row);

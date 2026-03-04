@@ -27,24 +27,20 @@
     padding: 0;
 }
 
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
 body {
     margin: 0;
     padding: 0;
+    /* Убираем градиентный фон */
     background: none;
     color: var(--dark);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     position: relative;
 }
 
-/* Фоновый рисунок */
+/* Затемненный фоновый рисунок */
 body::before {
     content: '';
     position: fixed;
@@ -56,9 +52,8 @@ body::before {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: brightness(0.5);
+    filter: brightness(0.5); /* Затемнение 60% - можно регулировать */
     z-index: -1;
-    pointer-events: none;
 }
 
 .container {
@@ -66,43 +61,33 @@ body::before {
     width: 100%;
     margin: 0;
     background: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
     border-radius: 0;
     box-shadow: none;
-    overflow: visible;
+    overflow: hidden;
     position: relative;
     z-index: 1;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
 }
 
 /* ===== СТИЛИ ДЛЯ НОВОЙ ШАПКИ ===== */
 .header {
-    background: #000000;
+    background: #000000; /* Черный цвет */
     color: white;
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    overflow: visible;
+    position: relative;
+    overflow: hidden;
     padding: 0;
     margin: 0;
     width: 100%;
-    flex-shrink: 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
+    padding: 8px 40px;
     margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-    background: #302f2f;
+    background: #302f2f; /* Черный цвет */
 }
 
 .nav-links {
@@ -119,7 +104,6 @@ body::before {
     transition: all 0.3s ease;
     position: relative;
     cursor: pointer;
-    white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -155,7 +139,6 @@ body::before {
     border: 1px solid rgba(255,255,255,0.2);
     transition: all 0.3s ease;
     cursor: pointer;
-    white-space: nowrap;
 }
 
 .get-the-new:hover {
@@ -177,8 +160,8 @@ body::before {
 }
 
 .logo-area img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     padding: 0;
     background: transparent;
     margin-right: -10px;
@@ -209,46 +192,6 @@ body::before {
     -webkit-backdrop-filter: blur(5px);
 }
 
-/* ===== ИНДИКАТОР РЕЖИМА ===== */
-.mode-indicator {
-    padding: 16px 24px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    background: #302f2f;
-    color: rgba(255,255,255,0.9);
-    position: relative;
-    z-index: 999;
-    width: 100%;
-}
-
-.view-mode {
-    background: #302f2f;
-    color: rgba(255,255,255,0.9);
-}
-
-.edit-mode {
-    background: #2a2a2a;
-    color: white;
-    border-left: 4px solid #6a6a6a;
-}
-
-/* Иконка в индикаторе */
-.mode-indicator span:first-child {
-    font-size: 1.2rem;
-    opacity: 0.9;
-}
-
-/* Текст режима */
-#modeText {
-    font-weight: 500;
-    font-size: 0.95rem;
-    letter-spacing: 0.3px;
-}
-
 /* ===== ВКЛАДКИ ===== */
 .tabs {
     display: flex;
@@ -257,8 +200,6 @@ body::before {
     background: white;
     border-bottom: 2px solid var(--border);
     flex-wrap: wrap;
-    position: relative;
-    z-index: 998;
 }
 
 .tab {
@@ -285,18 +226,13 @@ body::before {
 
 /* ===== АВТОРИЗАЦИЯ ===== */
 .auth-section {
-    padding: 40px 24px;
+    padding: 60px 24px;
     background: transparent;
     border-bottom: none;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .auth-panel-simple {
     max-width: 450px;
-    width: 100%;
     margin: 0 auto;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -373,6 +309,7 @@ body::before {
     background: linear-gradient(145deg, var(--primary), var(--secondary));
     color: white;
     width: 100%;
+    
 }
 
 .btn-secondary {
@@ -400,6 +337,28 @@ body::before {
     color: white;
 }
 
+/* ===== ИНДИКАТОР РЕЖИМА ===== */
+.mode-indicator {
+    padding: 16px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.view-mode {
+    background: var(--gray-light);
+    color: var(--gray);
+}
+
+.edit-mode {
+    background: var(--info-light);
+    color: var(--info);
+    border-left: 4px solid var(--info);
+}
+
 /* ===== ПАНЕЛИ УПРАВЛЕНИЯ ===== */
 .edit-controls {
     padding: 24px;
@@ -418,29 +377,9 @@ body::before {
 .table-container {
     padding: 0;
     overflow-x: auto;
-    overflow-y: auto;
     max-height: 600px;
+    overflow-y: auto;
     background: white;
-    margin-bottom: 0; /* Убираем отступ */
-}
-
-.table-container::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-.table-container::-webkit-scrollbar-track {
-    background: #e0e0e0;
-    border-radius: 10px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-    background: #302f2f;
-    border-radius: 10px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
 }
 
 table {
@@ -791,21 +730,64 @@ td {
     font-size: 0.8rem;
     border-radius: 20px;
 }
+/* ===== ИНДИКАТОР РЕЖИМА ===== */
+.mode-indicator {
+    padding: 16px 24px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: #302f2f;
+    color: rgba(255,255,255,0.9);
+}
 
-/* ===== ФУТЕР ===== */
+.view-mode {
+    background: #302f2f;
+    color: rgba(255,255,255,0.9);
+}
+
+.edit-mode {
+    background: #2a2a2a;
+    color: white;
+    border-left: 4px solid #6a6a6a;
+}
+
+/* Иконка в индикаторе */
+.mode-indicator span:first-child {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Текст режима */
+#modeText {
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .mode-indicator {
+        padding: 14px 20px;
+        font-size: 0.9rem;
+    }
+    
+    #modeText {
+        font-size: 0.9rem;
+    }
+}
+/* ===== ФУТЕР (ОБНОВЛЕН) ===== */
 .footer {
     padding: 24px 32px;
-    background: #302f2f;
-    border-top: none;
-    color: rgba(255,255,255,0.9);
+    background: #302f2f; /* Такой же цвет как у navbar */
+    border-top: none; /* Убираем границу */
+    color: rgba(255,255,255,0.9); /* Белый текст как в навигации */
     font-size: 0.9rem;
     text-align: center;
     position: relative;
     overflow: hidden;
-    flex-shrink: 0;
-    margin-top: 0; /* Убираем отступ сверху */
-    width: 100%;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
 }
 
 /* Добавляем легкий разделитель как в шапке */
@@ -823,24 +805,15 @@ td {
     display: flex;
     justify-content: center;
     gap: 40px;
-    margin: 20px 0 0;
+    margin-top: 20px;
     flex-wrap: wrap;
-}
-/* Убираем лишние отступы у последнего элемента */
-.footer > div:last-child {
-    margin-bottom: 0;
-}
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
 }
 
 .footer .summary-stat {
     text-align: center;
     min-width: 120px;
     padding: 15px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.1); /* Полупрозрачный фон как у кнопки get-the-new */
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     border-radius: 20px;
@@ -915,76 +888,6 @@ td {
     appearance: none;
 }
 
-/* ===== ЛИЧНЫЙ КАБИНЕТ ===== */
-#personalView {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 40px 20px;
-    background: white;
-    margin-bottom: 0; /* Убираем отступ */
-}
-
-#personalView .table-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    background: transparent;
-    box-shadow: none;
-    max-height: none;
-    overflow: visible;
-}
-
-#personalStats {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-/* Центрирование карточек статистики */
-#personalStats > div:first-child {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-/* Центрирование прогресса */
-.progress-container {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Центрирование таблиц */
-#personalStats table {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#personalStats th,
-#personalStats td {
-    text-align: center;
-}
-
-/* Заголовки */
-#personalStats h3 {
-    text-align: center;
-    width: 100%;
-}
-
-/* Имя пользователя */
-#personalName {
-    text-align: center;
-    width: 100%;
-    margin-bottom: 30px;
-    font-size: 2rem;
-    color: #2c3e50;
-}
-
 /* ===== АДАПТИВНОСТЬ ===== */
 @media (max-width: 992px) {
     .navbar {
@@ -1006,7 +909,7 @@ td {
     .nav-links {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 15px;
+        gap: 20px;
     }
 
     .tabs {
@@ -1050,8 +953,8 @@ td {
 
     .table-container {
         max-height: 500px;
-        margin-bottom: 0px;
     }
+
     td {
         padding: 15px 12px;
     }
@@ -1109,19 +1012,9 @@ td {
         padding: 12px 20px;
     }
 
-    .mode-indicator {
-        padding: 14px 20px;
-        font-size: 0.9rem;
-    }
-    
-    #modeText {
-        font-size: 0.9rem;
-    }
-
     /* Адаптивность для футера */
     .footer {
         padding: 20px;
-        margin-top: 0;
     }
     
     .footer .summary-stats {
@@ -1136,24 +1029,15 @@ td {
     .footer .summary-value {
         font-size: 1.5rem;
     }
-
-    #personalView {
-        padding: 20px;
-         margin-bottom: 0;
-    }
-    
-    #personalName {
-        font-size: 1.5rem;
-    }
 }
 
 @media (max-width: 480px) {
     .nav-links {
-        gap: 10px;
+        gap: 15px;
     }
     
     .nav-link {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
     
     .get-the-new {
@@ -1163,15 +1047,6 @@ td {
     
     .footer .summary-stat {
         min-width: 100%;
-    }
-    
-    .logo-area img {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .logo-text h1 {
-        font-size: 1.5rem;
     }
 }
 

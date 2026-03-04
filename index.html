@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>AutomaDraw • Учёт работ</title>
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Основной favicon -->
     <link rel="icon" type="image/png" href="autodraw_logo.png">
     <link rel="icon" type="image/png" sizes="32x32" href="autodraw_logo.png">
@@ -83,10 +86,13 @@
                            placeholder="Введите ваше имя">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group password-field">
                     <input type="password" class="form-control" id="passwordInput" 
                            placeholder="Введите пароль" 
                            onkeypress="handlePasswordEnter(event)">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i id="toggleIcon" class="fa-regular fa-eye"></i>
+                    </button>
                 </div>
                 <button class="btn btn-primary" onclick="login()">
                     Войти

@@ -1580,6 +1580,19 @@ function handlePasswordEnter(event) {
     if (event.key === 'Enter') login();
 }
 
+function togglePassword() {
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.className = 'fa-regular fa-eye-slash';
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.className = 'fa-regular fa-eye';
+    }
+}
+
 // Загрузка данных из Supabase при старте
 function loadFromSupabase() {
     showLoading();

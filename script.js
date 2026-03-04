@@ -379,7 +379,7 @@ function showClientPersonalView(clientIndex) {
         historyRows = `
             <tr>
                 <td colspan="3" style="padding: 40px; text-align: center; color: #95a5a6;">
-                    📭 Пока нет выполненных работ
+                    Пока нет выполненных работ
                 </td>
             </tr>
         `;

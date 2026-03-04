@@ -90,6 +90,7 @@ const personalView = document.getElementById('personalView');
 const personalName = document.getElementById('personalName');
 const personalStats = document.getElementById('personalStats');
 const passwordInput = document.getElementById('passwordInput');
+const usernameInput = document.getElementById('usernameInput');
 const clientNameInput = document.getElementById('clientNameInput');
 const clientPasswordInput = document.getElementById('clientPasswordInput');
 const referrerNameInput = document.getElementById('referrerNameInput');
@@ -553,45 +554,71 @@ function showReferrerPersonalView(referrerIndex) {
 }
 
 function login() {
+    const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
+    
+    if (!username) {
+        showNotification('Введите имя', 'error');
+        return;
+    }
     
     if (!password) {
         showNotification('Введите пароль', 'error');
         return;
     }
     
+    // Проверка админа
     if (password === EDIT_PASSWORD) {
         currentUser = { type: 'admin', name: 'Администратор' };
         sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
         enterAdminMode();
         showNotification('Добро пожаловать, администратор!', 'success');
         passwordInput.value = '';
+        usernameInput.value = '';
         return;
     }
     
-    const selectedUser = userSelect.value;
-    if (!selectedUser) {
-        showNotification('Выберите пользователя', 'error');
-        return;
+    // Поиск клиента по имени
+    const clientIndex = data.clients.findIndex(c => c.name.toLowerCase() === username.toLowerCase());
+    if (clientIndex !== -1) {
+        const client = data.clients[clientIndex];
+        if (client.password === password) {
+            currentUser = { 
+                type: 'client', 
+                index: clientIndex, 
+                name: client.name,
+                id: client.id 
+            };
+            sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+            enterUserMode(currentUser);
+            showNotification(`Добро пожаловать, ${client.name}!`, 'success');
+            passwordInput.value = '';
+            usernameInput.value = '';
+            return;
+        }
     }
     
-    const [type, index] = selectedUser.split('_');
-    const userData = type === 'client' ? data.clients[parseInt(index)] : data.referrers[parseInt(index)];
-    
-    if (userData && userData.password === password) {
-        currentUser = { 
-            type: type, 
-            index: parseInt(index), 
-            name: userData.name,
-            id: userData.id 
-        };
-        sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
-        enterUserMode(currentUser);
-        showNotification(`Добро пожаловать, ${userData.name}!`, 'success');
-    } else {
-        showNotification('Неверный пароль', 'error');
+    // Поиск реферера по имени
+    const referrerIndex = data.referrers.findIndex(r => r.name.toLowerCase() === username.toLowerCase());
+    if (referrerIndex !== -1) {
+        const referrer = data.referrers[referrerIndex];
+        if (referrer.password === password) {
+            currentUser = { 
+                type: 'referrer', 
+                index: referrerIndex, 
+                name: referrer.name,
+                id: referrer.id 
+            };
+            sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+            enterReferrerMode(currentUser);
+            showNotification(`Добро пожаловать, ${referrer.name}!`, 'success');
+            passwordInput.value = '';
+            usernameInput.value = '';
+            return;
+        }
     }
     
+    showNotification('Неверное имя или пароль', 'error');
     passwordInput.value = '';
 }
 

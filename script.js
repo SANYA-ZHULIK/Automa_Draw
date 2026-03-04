@@ -234,7 +234,10 @@ function initPage() {
     
     if (currentUser) {
         console.log('👤 Пользователь найден в sessionStorage:', currentUser);
+        // Применяем класс logged-in если пользователь уже вошёл
+        document.body.classList.add('logged-in');
         if (currentUser.type === 'admin') {
+            document.body.classList.add('admin-mode');
             enterAdminMode();
         } else {
             enterUserMode(currentUser);
@@ -298,6 +301,12 @@ function showAuthScreen() {
 function enterAdminMode() {
     console.log('👑 Вход в режим администратора');
     
+    // Прокрутка наверх
+    window.scrollTo(0, 0);
+    
+    // Добавляем класс для CSS
+    document.body.classList.add('logged-in', 'admin-mode');
+    
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator edit-mode';
     modeText.innerHTML = '<Режим администратора • Полный доступ';
@@ -331,6 +340,9 @@ function enterAdminMode() {
 
 function enterUserMode(user) {
     console.log('👤 Вход в режим пользователя:', user);
+    
+    // Прокрутка наверх
+    window.scrollTo(0, 0);
     
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator view-mode';
@@ -571,6 +583,7 @@ function login() {
     if (password === EDIT_PASSWORD) {
         currentUser = { type: 'admin', name: 'Администратор' };
         sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+        document.body.classList.add('logged-in', 'admin-mode');
         enterAdminMode();
         showNotification('Добро пожаловать, администратор!', 'success');
         passwordInput.value = '';
@@ -590,6 +603,7 @@ function login() {
                 id: client.id 
             };
             sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
+            document.body.classList.add('logged-in');
             enterUserMode(currentUser);
             showNotification(`Добро пожаловать, ${client.name}!`, 'success');
             passwordInput.value = '';
@@ -610,7 +624,8 @@ function login() {
                 id: referrer.id 
             };
             sessionStorage.setItem(AUTH_KEY, JSON.stringify(currentUser));
-            enterReferrerMode(currentUser);
+            document.body.classList.add('logged-in');
+            enterUserMode(currentUser);
             showNotification(`Добро пожаловать, ${referrer.name}!`, 'success');
             passwordInput.value = '';
             usernameInput.value = '';
@@ -626,6 +641,7 @@ function logout() {
     if (confirm('Выйти из системы?')) {
         currentUser = null;
         sessionStorage.removeItem(AUTH_KEY);
+        document.body.classList.remove('logged-in');
         showAuthScreen();
         showNotification('Вы вышли из системы', 'info');
     }

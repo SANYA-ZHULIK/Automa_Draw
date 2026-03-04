@@ -85,7 +85,7 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
+    padding: 8px 40px;
     margin: 0;
     background: #302f2f; /* Черный цвет */
 }
@@ -730,18 +730,78 @@ td {
     font-size: 0.8rem;
     border-radius: 20px;
 }
-
-/* ===== ФУТЕР ===== */
-.footer {
-    padding: 24px 32px;
-    background: var(--gray-light);
-    border-top: 1px solid var(--border);
-    color: var(--gray);
-    font-size: 0.9rem;
-    text-align: center;
+/* ===== ИНДИКАТОР РЕЖИМА ===== */
+.mode-indicator {
+    padding: 16px 24px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: #302f2f;
+    color: rgba(255,255,255,0.9);
 }
 
-.summary-stats {
+.view-mode {
+    background: #302f2f;
+    color: rgba(255,255,255,0.9);
+}
+
+.edit-mode {
+    background: #2a2a2a;
+    color: white;
+    border-left: 4px solid #6a6a6a;
+}
+
+/* Иконка в индикаторе */
+.mode-indicator span:first-child {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Текст режима */
+#modeText {
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .mode-indicator {
+        padding: 14px 20px;
+        font-size: 0.9rem;
+    }
+    
+    #modeText {
+        font-size: 0.9rem;
+    }
+}
+/* ===== ФУТЕР (ОБНОВЛЕН) ===== */
+.footer {
+    padding: 24px 32px;
+    background: #302f2f; /* Такой же цвет как у navbar */
+    border-top: none; /* Убираем границу */
+    color: rgba(255,255,255,0.9); /* Белый текст как в навигации */
+    font-size: 0.9rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Добавляем легкий разделитель как в шапке */
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+.footer .summary-stats {
     display: flex;
     justify-content: center;
     gap: 40px;
@@ -749,29 +809,45 @@ td {
     flex-wrap: wrap;
 }
 
-.summary-stat {
+.footer .summary-stat {
     text-align: center;
     min-width: 120px;
     padding: 15px;
-    background: white;
+    background: rgba(255,255,255,0.1); /* Полупрозрачный фон как у кнопки get-the-new */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
 }
 
-.summary-value {
+.footer .summary-stat:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+}
+
+.footer .summary-value {
     font-size: 2rem;
     font-weight: 800;
-    color: var(--dark);
+    color: white;
     margin-bottom: 5px;
     line-height: 1.2;
 }
 
-.summary-label {
+.footer .summary-label {
     font-size: 0.8rem;
-    color: var(--gray);
+    color: rgba(255,255,255,0.8);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Текст в футере */
+.footer > div:first-child {
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin-bottom: 15px;
 }
 
 .hidden {
@@ -935,6 +1011,24 @@ td {
         font-size: 0.9rem;
         padding: 12px 20px;
     }
+
+    /* Адаптивность для футера */
+    .footer {
+        padding: 20px;
+    }
+    
+    .footer .summary-stats {
+        gap: 15px;
+    }
+    
+    .footer .summary-stat {
+        min-width: calc(50% - 15px);
+        padding: 12px;
+    }
+    
+    .footer .summary-value {
+        font-size: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -949,6 +1043,10 @@ td {
     .get-the-new {
         padding: 6px 15px;
         font-size: 0.8rem;
+    }
+    
+    .footer .summary-stat {
+        min-width: 100%;
     }
 }
 

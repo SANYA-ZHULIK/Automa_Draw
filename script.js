@@ -196,22 +196,28 @@ function updateUserSelect() {
     userSelect.innerHTML = '<option value="">Выберите пользователя</option>';
     
     data.clients.forEach((client, index) => {
-        if (client.password) {
-            const option = document.createElement('option');
-            option.value = `client_${index}`;
-            option.textContent = `👤 Клиент: ${client.name}`;
-            userSelect.appendChild(option);
-        }
-    });
-    
-    data.referrers.forEach((referrer, index) => {
-        if (referrer.password) {
-            const option = document.createElement('option');
-            option.value = `referrer_${index}`;
-            option.textContent = `🤝 Реферер: ${referrer.name}`;
-            userSelect.appendChild(option);
-        }
-    });
+    if (client.password) {
+        const option = document.createElement('option');
+        option.value = `client_${index}`;
+        option.textContent = `Клиент: ${client.name}`;
+        option.style.color = '#27ae60'; // Темно-зеленый
+        option.style.fontWeight = '600';
+        
+        userSelect.appendChild(option);
+    }
+});
+
+data.referrers.forEach((referrer, index) => {
+    if (referrer.password) {
+        const option = document.createElement('option');
+        option.value = `referrer_${index}`;
+        option.textContent = `Реферер: ${referrer.name}`;
+        option.style.color = '#e67e22'; // Оранжевый
+        option.style.fontWeight = '600';
+        
+        userSelect.appendChild(option);
+    }
+});
 }
 
 function showAuthScreen() {
@@ -348,7 +354,7 @@ function showClientPersonalView(clientIndex) {
             }
         </div>
         
-        ${referrer ? `<p style="margin-top: 20px;">🤝 Вас привел: <strong>${referrer.name}</strong></p>` : ''}
+        ${referrer ? `<p style="margin-top: 20px;"> Вас привел: <strong>${referrer.name}</strong></p>` : ''}
         
         ${historyHtml}
     `;
@@ -391,8 +397,8 @@ function showReferrerPersonalView(referrerIndex) {
         
         <div style="background: #e8f5e9; padding: 20px; border-radius: 16px; margin: 20px 0;">
             <h3>Статус выплат</h3>
-            <p style="font-size: 1.2rem;">💰 Выплачено: <strong>${stats.paidBonus.toFixed(2)} BYN</strong></p>
-            <p style="font-size: 1.2rem;">💵 К выплате: <strong>${stats.toPay.toFixed(2)} BYN</strong></p>
+            <p style="font-size: 1.2rem;"> Выплачено: <strong>${stats.paidBonus.toFixed(2)} BYN</strong></p>
+            <p style="font-size: 1.2rem;"> К выплате: <strong>${stats.toPay.toFixed(2)} BYN</strong></p>
         </div>
         
         ${clientsHtml}
@@ -879,7 +885,7 @@ function renderClientsTable() {
             if (referrer) {
                 referrerInfo = `
                     <div class="client-name" style="font-size: 1rem; color: #2980b9;">${referrer.name}</div>
-                    <div class="referrer-badge badge badge-referrer">🤝 привел</div>
+                    <div class="referrer-badge badge badge-referrer">привел</div>
                 `;
             } else {
                 client.referrerId = null;
@@ -890,7 +896,7 @@ function renderClientsTable() {
         if (stats.isDiscountAvailable) {
             statusHtml = `
                 <div class="discount-indicator discount-available">
-                    ✅ Скидка готова!
+                    Скидка готова!
                     <button class="action-btn action-discount" onclick="applyDiscount(${index})" style="margin-left: 10px; padding: 4px 8px; min-width: auto;">
                         Применить 50%
                     </button>
@@ -899,7 +905,7 @@ function renderClientsTable() {
         } else {
             statusHtml = `
                 <div class="discount-indicator discount-pending">
-                    🔄 Нужно еще ${stats.worksUntilDiscount} работ
+                    Нужно еще работ до получения скидки: ${stats.worksUntilDiscount} 
                 </div>
             `;
         }
@@ -920,7 +926,7 @@ function renderClientsTable() {
             <div class="password-cell">
                 ${client.password ? 
                     `<button class="btn btn-info btn-sm" onclick="showPassword('${client.password}', '${client.name}', 'client')" style="padding: 5px 10px; font-size: 0.8rem; border-radius: 20px;">
-                        🔐 Показать
+                         Показать
                     </button>` : 
                     '<span style="color: #95a5a6;">❌</span>'
                 }
@@ -999,7 +1005,7 @@ function renderReferrersTable() {
             <div class="password-cell">
                 ${referrer.password ? 
                     `<button class="btn btn-info btn-sm" onclick="showPassword('${referrer.password}', '${referrer.name}', 'referrer')" style="padding: 5px 10px; font-size: 0.8rem; border-radius: 20px;">
-                        🔐 Показать
+                         Показать
                     </button>` : 
                     '<span style="color: #95a5a6;">❌</span>'
                 }

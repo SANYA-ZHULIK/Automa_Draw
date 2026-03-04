@@ -5,7 +5,60 @@ const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ';
 // Глобальный клиент Supabase
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// === НАСТРОЙКИ ПРИЛОЖЕНИЯ ===
+// === ФУНКЦИИ ДЛЯ ТАБЛИЦЫ WORKS ===
+async function initWorksTable() {
+    // Создаем таблицу works если её нет
+    try {
+        const { error } = await supabaseClient
+            .from('works')
+            .select('id')
+            .limit(1);
+        
+        if (error && error.code === '42P01') {
+            console.log('📋 Таблица works не существует, создаём...');
+            // Таблицу нужно создать в Supabase вручную
+            // или использовать SQL запрос
+        }
+    } catch (e) {
+        console.log('📋 Проверка таблицы works:', e.message);
+    }
+}
+
+// Добавить работу в таблицу works
+async function addWorkToTable(clientName, workData) {
+    const { data, error } = await supabaseClient
+        .from('works')
+        .insert([{
+            client_name: clientName,
+            work_type: workData.type || '',
+            price: workData.price,
+            is_discounted: workData.isDiscounted,
+            bonus_applied: workData.bonusApplied,
+            work_date: workData.date
+        }])
+        .select();
+    
+    if (error) {
+        console.error('Ошибка добавления работы в таблицу works:', error);
+        return null;
+    }
+    return data;
+}
+
+// Получить все работы для клиента
+async function getWorksForClient(clientName) {
+    const { data, error } = await supabaseClient
+        .from('works')
+        .select('*')
+        .eq('client_name', clientName)
+        .order('work_date', { ascending: false });
+    
+    if (error) {
+        console.error('Ошибка получения работ:', error);
+        return [];
+    }
+    return data || [];
+}
 const EDIT_PASSWORD = "admin123";
 const AUTH_KEY = 'currentUser';
 const DISCOUNT_CYCLE = 9;
@@ -58,6 +111,7 @@ let currentPasswordForCopy = '';
 const workModal = document.getElementById('workModal');
 const modalClientName = document.getElementById('modalClientName');
 const workPrice = document.getElementById('workPrice');
+const workType = document.getElementById('workType');
 const applyBonus = document.getElementById('applyBonus');
 const bonusAmount = document.getElementById('bonusAmount');
 const bonusCheckboxContainer = document.getElementById('bonusCheckboxContainer');
@@ -365,11 +419,13 @@ function showClientPersonalView(clientIndex) {
             const type = work.isDiscounted ? 
                 '<span style="color: #f39c12; font-weight: 600;">Со скидкой 50%</span>' : 
                 '<span style="color: #27ae60; font-weight: 600;">Полная цена</span>';
+            const workTypeDisplay = work.type ? `<span style="color: #667eea; font-weight: 500;">${work.type}</span>` : '<span style="color: #95a5a6;">—</span>';
             
             historyRows += `
                 <tr style="border-bottom: 1px solid #eaeaea;">
                     <td style="padding: 12px 15px; text-align: center;">${date}</td>
                     <td style="padding: 12px 15px; text-align: center; font-weight: 600;">${work.price} BYN</td>
+                    <td style="padding: 12px 15px; text-align: center;">${workTypeDisplay}</td>
                     <td style="padding: 12px 15px; text-align: center;">${type}</td>
                 </tr>
             `;
@@ -378,7 +434,7 @@ function showClientPersonalView(clientIndex) {
         // Пустая строка для отображения
         historyRows = `
             <tr>
-                <td colspan="3" style="padding: 40px; text-align: center; color: #95a5a6;">
+                <td colspan="4" style="padding: 40px; text-align: center; color: #95a5a6;">
                     Пока нет выполненных работ
                 </td>
             </tr>
@@ -393,7 +449,8 @@ function showClientPersonalView(clientIndex) {
                     <tr style="background: #f8f9fa;">
                         <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Дата</th>
                         <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Цена</th>
-                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Тип</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Тип работы</th>
+                        <th style="padding: 15px; text-align: center; font-weight: 600; color: #7f8c8d;">Статус</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -662,6 +719,7 @@ async function applyDiscount(clientIndex) {
     const discountWork = {
         date: new Date().toISOString(),
         price: AVG_PRICE / 2,
+        type: '', // Тип работы не указывается при скидке
         bonusApplied: false,
         isDiscounted: true
     };
@@ -730,6 +788,7 @@ async function confirmAddWork() {
     const workEntry = {
         date: new Date().toISOString(),
         price: price,
+        type: workType.value || '', // Тип работы
         bonusApplied: applyBonusChecked,
         isDiscounted: false
     };
@@ -757,6 +816,10 @@ async function confirmAddWork() {
         
         if (clientError) throw clientError;
         console.log('✅ Клиент обновлен');
+        
+        // 3. Сохраняем работу в таблицу works (для отображения типов работ)
+        await addWorkToTable(client.name, workEntry);
+        console.log('✅ Работа добавлена в таблицу works');
         
         // 3. Обновляем статистику клиента
         await updateClientStats(client);
@@ -918,6 +981,7 @@ function openWorkModal(clientIndex) {
     
     modalClientName.textContent = `Добавление работы для ${client.name}`;
     workPrice.value = AVG_PRICE;
+    workType.value = ''; // Очищаем поле типа работы
     
     if (client.referrerId) {
         const referrer = data.referrers.find(r => String(r.id) === String(client.referrerId));

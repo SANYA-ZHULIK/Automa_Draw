@@ -494,7 +494,7 @@ thead {
 
 th {
     padding: 18px 16px;
-    text-align: left;
+    text-align: center;
     font-weight: 700;
     font-size: 0.85rem;
     color: var(--gray);
@@ -511,11 +511,13 @@ tbody tr {
 td {
     padding: 20px 16px;
     vertical-align: middle;
+    text-align: center;
 }
 
 /* ===== КАРТОЧКИ СТАТИСТИКИ ===== */
 .client-info {
     min-width: 200px;
+    text-align: left !important;
 }
 
 .client-name {
@@ -536,6 +538,8 @@ td {
     border-radius: 12px;
     padding: 12px 15px;
     min-width: 100px;
+    display: inline-block;
+    text-align: center;
 }
 
 .stat-value {
@@ -627,6 +631,7 @@ td {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .action-btn {
@@ -818,6 +823,7 @@ td {
 /* ===== ПАРОЛИ ===== */
 .password-cell {
     position: relative;
+    text-align: center;
 }
 
 .password-cell .btn-info {

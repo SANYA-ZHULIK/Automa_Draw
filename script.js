@@ -27,6 +27,8 @@ async function initWorksTable() {
 
 // Добавить работу в таблицу works
 async function addWorkToTable(clientName, workData) {
+    console.log('📝 addWorkToTable вызвана с:', { clientName, workData });
+    
     const { data, error } = await supabaseClient
         .from('works')
         .insert([{
@@ -74,7 +76,8 @@ let selectedClientIndex = null;
 // Данные (только в памяти)
 let data = {
     clients: [],
-    referrers: []
+    referrers: [],
+    works: [] // Работы из таблицы works
 };
 
 // Элементы страницы
@@ -418,22 +421,23 @@ function showClientPersonalView(clientIndex) {
         `<p style="margin: 5px 0; font-size: 0.8rem;">Привел: <strong style="color: #6b6b6b;">${referrer.name}</strong></p>` : 
         '';
     
-    // История работ
-    const sortedWorks = client.workHistory && client.workHistory.length > 0 
-        ? [...client.workHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
-        : [];
+    // История работ (из таблицы works)
+    const clientWorks = data.works.filter(w => w.client_name === client.name)
+        .sort((a, b) => new Date(b.work_date) - new Date(a.work_date));
     
     let historyRows = '';
-    if (sortedWorks.length > 0) {
-        sortedWorks.forEach(work => {
-            const date = new Date(work.date).toLocaleDateString('ru-RU');
-            const type = work.isDiscounted ? 
+    if (clientWorks.length > 0) {
+        clientWorks.forEach(work => {
+            const date = new Date(work.work_date).toLocaleDateString('ru-RU');
+            const type = work.is_discounted ? 
                 '<span style="color: #f39c12; font-weight: 600;">50%</span>' : 
                 '<span style="color: #27ae60; font-weight: 600;">100%</span>';
+            const workType = work.work_type || '—';
             
             historyRows += `
                 <tr>
                     <td style="padding: 4px 6px; font-size: 0.7rem;">${date}</td>
+                    <td style="padding: 4px 6px; font-size: 0.7rem;">${workType}</td>
                     <td style="padding: 4px 6px; font-weight: 600; font-size: 0.7rem;">${work.price}</td>
                     <td style="padding: 4px 6px; font-size: 0.7rem;">${type}</td>
                 </tr>
@@ -442,7 +446,7 @@ function showClientPersonalView(clientIndex) {
     } else {
         historyRows = `
             <tr>
-                <td colspan="3" style="padding: 10px; text-align: center; color: #95a5a6; font-size: 0.75rem;">
+                <td colspan="4" style="padding: 10px; text-align: center; color: #95a5a6; font-size: 0.75rem;">
                     Нет работ
                 </td>
             </tr>
@@ -456,6 +460,7 @@ function showClientPersonalView(clientIndex) {
                 <thead>
                     <tr style="background: #f8f9fa;">
                         <th style="padding: 6px; text-align: left; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Дата</th>
+                        <th style="padding: 6px; text-align: left; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Тип</th>
                         <th style="padding: 6px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Цена</th>
                         <th style="padding: 6px; text-align: right; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Статус</th>
                     </tr>
@@ -855,6 +860,17 @@ async function confirmAddWork() {
         // 3. Сохраняем работу в таблицу works (для отображения типов работ)
         await addWorkToTable(client.name, workEntry);
         console.log('✅ Работа добавлена в таблицу works');
+        
+        // Добавляем работу в локальный массив data.works
+        const newWork = {
+            client_name: client.name,
+            work_type: workEntry.type || '',
+            price: workEntry.price,
+            is_discounted: workEntry.isDiscounted,
+            bonus_applied: workEntry.bonusApplied,
+            work_date: workEntry.date
+        };
+        data.works.unshift(newWork);
         
         // 3. Обновляем статистику клиента
         await updateClientStats(client);
@@ -1295,7 +1311,7 @@ async function addNewClient() {
                 name: name,
                 password: password,
                 work_history: [],
-                referrer_id: referrerId
+                referrer_id: referrerId || null
             }])
             .select();
         
@@ -1647,6 +1663,18 @@ function loadFromSupabase() {
                     };
                 });
                 console.log('✅ Загружено ' + response.data.length + ' клиентов');
+            }
+            
+            // Загружаем работы из таблицы works
+            return supabaseClient
+                .from('works')
+                .select('*')
+                .order('work_date', { ascending: false });
+        })
+        .then(function(response) {
+            if (!response.error && response.data && response.data.length > 0) {
+                data.works = response.data;
+                console.log('✅ Загружено ' + response.data.length + ' работ из таблицы works');
             }
             
             // Обновляем интерфейс ТОЛЬКО если пользователь уже вошел

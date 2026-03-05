@@ -374,8 +374,6 @@ function enterUserMode(user) {
 function showClientPersonalView(clientIndex) {
     const client = data.clients[clientIndex];
     personalName.textContent = client.name;
-    personalName.style.textAlign = 'left';
-    personalName.style.marginBottom = '10px';
     
     const stats = calculateClientStats(client);
     const referrer = client.referrerId ? data.referrers.find(r => String(r.id) === String(client.referrerId)) : null;
@@ -474,8 +472,6 @@ function showClientPersonalView(clientIndex) {
 function showReferrerPersonalView(referrerIndex) {
     const referrer = data.referrers[referrerIndex];
     personalName.textContent = referrer.name;
-    personalName.style.textAlign = 'left';
-    personalName.style.marginBottom = '10px';
     
     const stats = calculateReferrerStats(referrer.id);
     

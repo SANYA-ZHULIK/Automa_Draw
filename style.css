@@ -44,12 +44,58 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 /* При входе - белый фон */
 body.logged-in {
     background-image: none;
     background-color: white;
+    padding-top: 20px;
+    padding-bottom: 60px;
+}
+
+/* Области над шапкой и под футером - темный цвет как у футера */
+body.logged-in::before,
+body.logged-in::after {
+    content: '';
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: #302f2f;
+    z-index: 99;
+}
+
+body.logged-in::before {
+    top: 0;
+}
+
+body.logged-in::after {
+    bottom: 0;
+}
+
+/* Для экрана входа (без входа) - темный фон как у шапки */
+body:not(.logged-in)::before,
+body:not(.logged-in)::after {
+    content: '';
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: #000000;
+    z-index: 99;
+}
+
+body:not(.logged-in)::before {
+    top: 0;
+}
+
+body:not(.logged-in)::after {
+    bottom: 0;
 }
 
 /* Контейнер - упрощено */
@@ -877,6 +923,12 @@ td {
         max-height: none !important;
         overflow-y: visible !important;
         text-align: left !important;
+    }
+    
+    /* Кнопка выхода в личном кабинете */
+    #personalView .btn-secondary {
+        padding: 8px 16px;
+        font-size: 0.8rem;
     }
     
     /* Кнопка выхода - всегда видимая и кликабельная */

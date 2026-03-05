@@ -1660,6 +1660,13 @@ function loadFromSupabase() {
             // Обновляем интерфейс ТОЛЬКО если пользователь уже вошел
             if (currentUser) {
                 console.log('👤 Пользователь уже в системе, обновляем интерфейс');
+                
+                // Добавляем класс logged-in
+                document.body.classList.add('logged-in');
+                if (currentUser.type === 'admin') {
+                    document.body.classList.add('admin-mode');
+                }
+                
                 updateUserSelect();
                 renderClientsTable();
                 renderReferrersTable();

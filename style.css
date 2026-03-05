@@ -38,47 +38,34 @@ body {
     position: relative;
 }
 
-/* Фоновое изображение - показываем когда НЕ залогинены */
-body:not(.logged-in) {
+/* Фоновое изображение - показываем когда залогинены */
+body {
     background-image: url('drawing_background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-/* Контейнер */
+/* Контейнер - упрощено */
 .container {
     max-width: 100%;
     width: 100%;
     margin: 0;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 0;
-    box-shadow: none;
-    overflow: visible;
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 80px;
-    transition: background 0.3s ease;
-    min-height: 100vh;
+    padding: 0;
 }
 
-/* После входа - белый фон */
-body.logged-in .container {
+/* Личный кабинет - белый фон вместо фото */
+#personalView,
+.personal-view {
     background: white;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    min-height: 100vh;
+    padding-bottom: 100px;
 }
 
-/* До входа - полупрозрачный тёмный фон чтобы было видно изображение сзади */
-body:not(.logged-in) .container {
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(5px);
+/* Таблицы - белый фон */
+.table-container {
+    background: white;
+    min-height: 100vh;
 }
 
 /* ===== СТИЛИ ДЛЯ НОВОЙ ШАПКИ ===== */
@@ -404,17 +391,6 @@ body:not(.logged-in) .container {
     gap: 12px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     margin-bottom: 16px;
-}
-
-/* Скрываем индикатор для клиентов и рефереров (не админов) */
-body.logged-in:not(.admin-mode) .mode-indicator {
-    display: none;
-}
-
-/* Скрываем шапку, футер при входе (не для админа) */
-body.logged-in:not(.admin-mode) .header,
-body.logged-in:not(.admin-mode) .footer {
-    display: none;
 }
 
 .view-mode {
@@ -838,31 +814,16 @@ td {
 
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
-    /* Клиент и рефер - скрываем шапку и футер */
-    body.logged-in:not(.admin-mode) .header,
-    body.logged-in:not(.admin-mode) .footer {
-        display: none;
-    }
-    
     /* Шапка - не sticky, скроллится с контентом */
     .header {
         position: relative;
     }
     
-    /* При входе - скрываем шапку, футер и индикатор */
-    body.logged-in .header,
-    body.logged-in .footer,
-    body.logged-in .mode-indicator {
-        display: none;
-    }
-    
-    /* Футер относительный на мобильных - не перекрывает контент */
+    /* Футер на мобильных - в потоке */
     .footer {
         padding: 6px 8px;
-        max-height: 20vh;
-        overflow-y: auto;
         position: relative;
-        bottom: auto;
+        background: #302f2f;
     }
     
     /* Режим индикатора */
@@ -895,13 +856,37 @@ td {
     /* Личный кабинет - отступ снизу */
     #personalView {
         margin-bottom: 20px;
+        display: block;
+        visibility: visible;
     }
     
-    /* Контейнер */
-    .container {
-        padding-bottom: 20px;
+    /* Кнопка выхода - всегда видимая и кликабельная */
+    #personalView .btn {
+        display: inline-block;
+        visibility: visible;
+        pointer-events: auto;
+        position: relative;
+        z-index: 1000;
+    }
+    
+    /* Футер на мобильных - ограниченная высота со скроллом */
+    .footer {
+        padding: 6px 8px;
+        max-height: 20vh;
+        overflow-y: auto;
+        position: fixed;
+        bottom: 0;
+    }
+    
+    /* Контейнер - отступ снизу для фиксированного футера */
+    #personalView,
+    .table-container,
+    .container,
+    .auth-section {
+        padding-bottom: 80px;
     }
 }
+
 /* ===== ФУТЕР (ОБНОВЛЕН) ===== */
 .footer {
     padding: 16px 24px;
@@ -910,12 +895,11 @@ td {
     color: rgba(255,255,255,0.9);
     font-size: 0.9rem;
     text-align: center;
-    position: fixed; /* Привязка к низу окна */
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    overflow: hidden;
 }
 
 /* Добавляем легкий разделитель как в шапке */
@@ -1052,7 +1036,19 @@ td {
 
     .auth-panel-simple {
         padding: 24px 20px;
-        margin-bottom: 80px; /* Отступ от футера на мобильных */
+        margin-bottom: 80px;
+    }
+    
+    /* Футер на странице входа - в потоке */
+    body:not(.logged-in) .footer {
+        position: relative;
+    }
+    
+    /* Футер в личных кабинетах - в самом низу страницы */
+    body.logged-in .footer {
+        position: relative;
+        max-height: 20vh;
+        overflow-y: auto;
     }
 
     .auth-title {

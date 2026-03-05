@@ -863,11 +863,20 @@ td {
         min-height: 100%;
     }
     
-    /* Убираем внутренний скролл в личном кабинете - скроллится вся страница */
+    /* Личный кабинет - убираем центрирование */
+    #personalView {
+        text-align: left !important;
+    }
+    
+    #personalView * {
+        text-align: left !important;
+    }
+    
+    /* Контейнер таблицы - убрать центрирование */
     #personalView .table-container {
-        max-height: none;
-        overflow-y: visible;
-        overflow-x: auto;
+        max-height: none !important;
+        overflow-y: visible !important;
+        text-align: left !important;
     }
     
     /* Кнопка выхода - всегда видимая и кликабельная */
@@ -881,7 +890,7 @@ td {
     
     /* Компактный личный кабинет на мобильных */
     #personalView {
-        padding: 8px 8px 80px;
+        padding: 8px;
     }
     
     #personalView > .table-container {
@@ -903,29 +912,28 @@ td {
     
     #personalName {
         font-size: 1.1rem;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        text-align: left;
     }
     
     #personalStats {
-        margin: 12px 0;
-    }
-    
-    #personalStats > div {
-        gap: 15px !important;
+        margin: 10px 0;
+        text-align: left;
     }
     
     .progress-container {
-        margin: 12px auto;
+        margin: 10px 0;
     }
     
-    /* Компактные таблицы в личном кабинете */
+    /* Таблицы - убираем центрирование */
     #personalView table {
-        font-size: 0.8rem;
+        text-align: left;
     }
     
     #personalView th,
     #personalView td {
-        padding: 8px 10px;
+        text-align: left;
+        padding: 6px 8px;
     }
 }
 
@@ -1113,12 +1121,22 @@ td {
         display: block;
         height: auto;
         overflow: visible;
+        text-align: left;
+    }
+    
+    body.logged-in:not(.admin-mode) * {
+        text-align: left !important;
     }
     
     /* Личный кабинет - нет отдельного скролла */
     #personalView {
         overflow: visible;
         height: auto;
+        text-align: left;
+    }
+    
+    #personalView * {
+        text-align: left !important;
     }
 
     .auth-title {
@@ -1260,7 +1278,7 @@ td {
     }
 
     #personalView {
-        padding: 5px 5px 80px;
+        padding: 5px;
     }
 
     .stat-card {
@@ -1279,21 +1297,27 @@ td {
     #personalName {
         font-size: 0.9rem;
         margin-bottom: 6px;
+        text-align: left;
     }
 
-    /* Компактные таблицы в личном кабинете */
+    #personalStats {
+        text-align: left;
+    }
+
+    /* Таблицы */
     #personalView table {
         font-size: 0.65rem;
+        text-align: left;
     }
 
     #personalView th,
     #personalView td {
+        text-align: left;
         padding: 5px 6px;
     }
 
-    /* Компактный прогресс бар */
     .progress-container {
-        margin: 6px auto;
+        margin: 6px 0;
     }
 
     .progress-bar-bg {

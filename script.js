@@ -374,55 +374,52 @@ function enterUserMode(user) {
 function showClientPersonalView(clientIndex) {
     const client = data.clients[clientIndex];
     personalName.textContent = client.name;
-    personalName.style.textAlign = 'center';
-    personalName.style.marginBottom = '15px';
+    personalName.style.textAlign = 'left';
+    personalName.style.marginBottom = '10px';
     
     const stats = calculateClientStats(client);
     const referrer = client.referrerId ? data.referrers.find(r => String(r.id) === String(client.referrerId)) : null;
     
     // Статистика клиента
     const statsHtml = `
-        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
-            <div class="stat-card" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">ВСЕГО</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <div class="stat-card" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">ВСЕГО</div>
             </div>
-            <div class="stat-card" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #2c3e50;">${stats.totalPaid}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">ПОЛН</div>
+            <div class="stat-card" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #2c3e50;">${stats.totalPaid}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">ПОЛН</div>
             </div>
-            <div class="stat-card discount-stat" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #2c3e50;">${stats.discountCount}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">СКИДКА</div>
+            <div class="stat-card discount-stat" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #2c3e50;">${stats.discountCount}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">СКИДКА</div>
             </div>
         </div>
     `;
     
     // Прогресс до скидки
     const progressHtml = `
-        <div style="margin: 15px auto; text-align: center; max-width: 500px;">
-            <div class="progress-container" style="width: 100%;">
-                <div class="progress-info" style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                    <span style="font-weight: 600;">${stats.paidInCycle}/9</span>
-                    <span style="color: #7f8c8d;">${Math.round(stats.progressPercent)}%</span>
-                </div>
-                <div class="progress-bar-bg" style="height: 8px; background: #ecf0f1; border-radius: 8px; overflow: hidden;">
-                    <div class="progress-bar" style="height: 100%; width: ${stats.progressPercent}%; background: linear-gradient(90deg, #6b6b6b, #b2b2b2);"></div>
-                </div>
+        <div style="margin: 10px 0; max-width: 100%;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 600; font-size: 0.8rem;">${stats.paidInCycle}/9 работ</span>
+                <span style="color: #7f8c8d; font-size: 0.8rem;">${Math.round(stats.progressPercent)}%</span>
+            </div>
+            <div style="height: 6px; background: #ecf0f1; border-radius: 6px; overflow: hidden;">
+                <div style="height: 100%; width: ${stats.progressPercent}%; background: linear-gradient(90deg, #6b6b6b, #b2b2b2);"></div>
             </div>
             ${stats.isDiscountAvailable ? 
-                '<p style="color: #27ae60; margin-top: 8px; font-weight: 600;">Скидка 50%!</p>' : 
-                `<p style="color: #e67e22; margin-top: 8px;">Осталось: ${stats.worksUntilDiscount}</p>`
+                '<p style="color: #27ae60; margin-top: 4px; font-weight: 600; font-size: 0.8rem;">Скидка 50%!</p>' : 
+                `<p style="color: #e67e22; margin-top: 4px; font-size: 0.8rem;">Осталось: ${stats.worksUntilDiscount}</p>`
             }
         </div>
     `;
     
-    // Информация о реферере
     const referrerHtml = referrer ? 
-        `<p style="margin: 8px auto; text-align: center; font-size: 0.85rem;">Привел: <strong style="color: #6b6b6b;">${referrer.name}</strong></p>` : 
+        `<p style="margin: 5px 0; font-size: 0.8rem;">Привел: <strong style="color: #6b6b6b;">${referrer.name}</strong></p>` : 
         '';
     
-    // История работ - ВСЕГДА ПОКАЗЫВАЕМ ТАБЛИЦУ
+    // История работ
     const sortedWorks = client.workHistory && client.workHistory.length > 0 
         ? [...client.workHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
         : [];
@@ -434,37 +431,34 @@ function showClientPersonalView(clientIndex) {
             const type = work.isDiscounted ? 
                 '<span style="color: #f39c12; font-weight: 600;">50%</span>' : 
                 '<span style="color: #27ae60; font-weight: 600;">100%</span>';
-            const workTypeDisplay = work.type ? `<span style="color: #667eea; font-weight: 500; font-size: 0.75rem;">${work.type}</span>` : '<span style="color: #95a5a6;">—</span>';
             
             historyRows += `
-                <tr style="border-bottom: 1px solid #eaeaea;">
-                    <td style="padding: 6px 8px; text-align: center; font-size: 0.75rem;">${date}</td>
-                    <td style="padding: 6px 8px; text-align: center; font-weight: 600; font-size: 0.75rem;">${work.price}</td>
-                    <td style="padding: 6px 8px; text-align: center; font-size: 0.75rem;">${workTypeDisplay}</td>
-                    <td style="padding: 6px 8px; text-align: center; font-size: 0.75rem;">${type}</td>
+                <tr>
+                    <td style="padding: 4px 6px; font-size: 0.7rem;">${date}</td>
+                    <td style="padding: 4px 6px; font-weight: 600; font-size: 0.7rem;">${work.price}</td>
+                    <td style="padding: 4px 6px; font-size: 0.7rem;">${type}</td>
                 </tr>
             `;
         });
     } else {
         historyRows = `
             <tr>
-                <td colspan="4" style="padding: 20px; text-align: center; color: #95a5a6; font-size: 0.8rem;">
-                    Пока нет работ
+                <td colspan="3" style="padding: 10px; text-align: center; color: #95a5a6; font-size: 0.75rem;">
+                    Нет работ
                 </td>
             </tr>
         `;
     }
     
     const historyHtml = `
-        <h3 style="margin: 15px auto 10px; text-align: center; color: #2c3e50; font-size: 1rem;">История</h3>
-        <div style="overflow-x: auto; display: flex; justify-content: center;">
-            <table style="width: 100%; max-width: 800px; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin: 0 auto; font-size: 0.8rem;">
+        <h3 style="margin: 10px 0 8px; color: #2c3e50; font-size: 0.9rem;">История</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; font-size: 0.75rem;">
                 <thead>
                     <tr style="background: #f8f9fa;">
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Дата</th>
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Цена</th>
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Тип</th>
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Статус</th>
+                        <th style="padding: 6px; text-align: left; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Дата</th>
+                        <th style="padding: 6px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Цена</th>
+                        <th style="padding: 6px; text-align: right; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Статус</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -480,47 +474,47 @@ function showClientPersonalView(clientIndex) {
 function showReferrerPersonalView(referrerIndex) {
     const referrer = data.referrers[referrerIndex];
     personalName.textContent = referrer.name;
-    personalName.style.textAlign = 'center';
-    personalName.style.marginBottom = '15px';
+    personalName.style.textAlign = 'left';
+    personalName.style.marginBottom = '10px';
     
     const stats = calculateReferrerStats(referrer.id);
     
     // Статистика реферера
     const statsHtml = `
-        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
-            <div class="stat-card" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #2c3e50;">${stats.clientsCount}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">КЛИЕНТОВ</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+            <div class="stat-card" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #2c3e50;">${stats.clientsCount}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">КЛИЕНТОВ</div>
             </div>
-            <div class="stat-card" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">РАБОТ</div>
+            <div class="stat-card" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #2c3e50;">${stats.totalWorks}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">РАБОТ</div>
             </div>
-            <div class="stat-card bonus-stat" style="text-align: center; padding: 10px; min-width: 80px;">
-                <div class="stat-value" style="font-size: 1.2rem; font-weight: 800; color: #3498db;">${stats.totalBonus.toFixed(1)}</div>
-                <div class="stat-label" style="color: #7f8c8d; font-weight: 600;">БОНУСОВ</div>
+            <div class="stat-card bonus-stat" style="text-align: center; padding: 8px 12px; flex: 1 1 80px;">
+                <div class="stat-value" style="font-size: 1.1rem; font-weight: 800; color: #3498db;">${stats.totalBonus.toFixed(1)}</div>
+                <div class="stat-label" style="color: #7f8c8d; font-weight: 600; font-size: 0.65rem;">БОНУСОВ</div>
             </div>
         </div>
     `;
     
     // Статус выплат
     const payoutHtml = `
-        <div style="background: #e8f5e9; padding: 15px; border-radius: 12px; margin: 15px auto; max-width: 600px; text-align: center;">
-            <h3 style="margin-bottom: 10px; color: #2c3e50; font-size: 1rem;">Выплаты</h3>
-            <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+        <div style="background: #e8f5e9; padding: 10px; border-radius: 8px; margin: 10px 0; text-align: left;">
+            <h3 style="margin-bottom: 8px; color: #2c3e50; font-size: 0.9rem;">Выплаты</h3>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                 <div>
-                    <div style="font-size: 1.2rem; font-weight: 700; color: #27ae60;">${stats.paidBonus.toFixed(1)}</div>
-                    <div style="color: #7f8c8d; margin-top: 3px; font-size: 0.75rem;">Выплачено</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: #27ae60;">${stats.paidBonus.toFixed(1)}</div>
+                    <div style="color: #7f8c8d; font-size: 0.7rem;">Выплачено</div>
                 </div>
                 <div>
-                    <div style="font-size: 1.2rem; font-weight: 700; color: #e67e22;">${stats.toPay.toFixed(1)}</div>
-                    <div style="color: #7f8c8d; margin-top: 3px; font-size: 0.75rem;">К выплате</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: #e67e22;">${stats.toPay.toFixed(1)}</div>
+                    <div style="color: #7f8c8d; font-size: 0.7rem;">К выплате</div>
                 </div>
             </div>
         </div>
     `;
     
-    // Приведенные клиенты - ВСЕГДА ПОКАЗЫВАЕМ ТАБЛИЦУ
+    // Приведенные клиенты
     const referredClients = data.clients.filter(c => String(c.referrerId) === String(referrer.id));
     
     let clientRows = '';
@@ -528,17 +522,17 @@ function showReferrerPersonalView(referrerIndex) {
         referredClients.forEach(client => {
             const clientBonus = calculateClientBonus(client);
             clientRows += `
-                <tr style="border-bottom: 1px solid #eaeaea;">
-                    <td style="padding: 8px 10px; text-align: center; font-weight: 500; font-size: 0.8rem;">${client.name}</td>
-                    <td style="padding: 8px 10px; text-align: center; font-size: 0.8rem;">${(client.workHistory || []).length}</td>
-                    <td style="padding: 8px 10px; text-align: center; font-weight: 600; color: #27ae60; font-size: 0.8rem;">${clientBonus.toFixed(1)}</td>
+                <tr>
+                    <td style="padding: 6px 8px; font-weight: 500; font-size: 0.75rem;">${client.name}</td>
+                    <td style="padding: 6px 8px; text-align: center; font-size: 0.75rem;">${(client.workHistory || []).length}</td>
+                    <td style="padding: 6px 8px; text-align: right; font-weight: 600; color: #27ae60; font-size: 0.75rem;">${clientBonus.toFixed(1)}</td>
                 </tr>
             `;
         });
     } else {
         clientRows = `
             <tr>
-                <td colspan="3" style="padding: 20px; text-align: center; color: #95a5a6; font-size: 0.8rem;">
+                <td colspan="3" style="padding: 15px; text-align: center; color: #95a5a6; font-size: 0.8rem;">
                     Нет клиентов
                 </td>
             </tr>
@@ -546,14 +540,14 @@ function showReferrerPersonalView(referrerIndex) {
     }
     
     const clientsHtml = `
-        <h3 style="margin: 15px auto 10px; text-align: center; color: #2c3e50; font-size: 1rem;">Клиенты</h3>
-        <div style="overflow-x: auto; display: flex; justify-content: center;">
-            <table style="width: 100%; max-width: 800px; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin: 0 auto; font-size: 0.8rem;">
+        <h3 style="margin: 10px 0 8px; color: #2c3e50; font-size: 0.9rem;">Клиенты</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; font-size: 0.75rem;">
                 <thead>
                     <tr style="background: #f8f9fa;">
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Клиент</th>
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Работ</th>
-                        <th style="padding: 8px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.7rem;">Бонус</th>
+                        <th style="padding: 6px; text-align: left; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Клиент</th>
+                        <th style="padding: 6px; text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Работ</th>
+                        <th style="padding: 6px; text-align: right; font-weight: 600; color: #7f8c8d; font-size: 0.65rem;">Бонус</th>
                     </tr>
                 </thead>
                 <tbody>

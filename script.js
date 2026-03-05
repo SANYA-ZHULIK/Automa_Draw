@@ -1,6 +1,7 @@
 // === НАСТРОЙКИ SUPABASE ===
-const SUPABASE_URL = 'https://ifodnbfkxucvurjsuwww.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_sWBMPk3OUy8I28ouUCLJWA_azGgN1vQ';
+// Загружаем конфигурацию из внешнего файла (не в git)
+const SUPABASE_URL = CONFIG.SUPABASE_URL;
+const SUPABASE_KEY = CONFIG.SUPABASE_KEY;
 
 // Глобальный клиент Supabase
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);

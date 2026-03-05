@@ -1026,8 +1026,6 @@ td {
     /* Футер в личных кабинетах - в самом низу страницы */
     body.logged-in .footer {
         position: relative;
-        max-height: 20vh;
-        overflow-y: auto;
     }
 
     .auth-title {

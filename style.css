@@ -54,18 +54,16 @@ body {
     padding: 0;
 }
 
-/* Личный кабинет - белый фон вместо фото */
+/* Личный кабинет - белый фон */
 #personalView,
 .personal-view {
     background: white;
-    min-height: 100vh;
-    padding-bottom: 100px;
+    padding-bottom: 20px;
 }
 
 /* Таблицы - белый фон */
 .table-container {
     background: white;
-    min-height: 100vh;
 }
 
 /* ===== СТИЛИ ДЛЯ НОВОЙ ШАПКИ ===== */
@@ -825,8 +823,6 @@ td {
         position: relative;
         background: #302f2f;
     }
-    
-    /* Режим индикатора */
     .mode-indicator {
         margin-top: 0;
         padding: 14px 20px;
@@ -867,23 +863,6 @@ td {
         pointer-events: auto;
         position: relative;
         z-index: 1000;
-    }
-    
-    /* Футер на мобильных - ограниченная высота со скроллом */
-    .footer {
-        padding: 6px 8px;
-        max-height: 20vh;
-        overflow-y: auto;
-        position: fixed;
-        bottom: 0;
-    }
-    
-    /* Контейнер - отступ снизу для фиксированного футера */
-    #personalView,
-    .table-container,
-    .container,
-    .auth-section {
-        padding-bottom: 80px;
     }
 }
 

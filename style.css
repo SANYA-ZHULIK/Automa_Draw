@@ -46,6 +46,12 @@ body {
     background-repeat: no-repeat;
 }
 
+/* При входе - белый фон */
+body.logged-in {
+    background-image: none;
+    background-color: white;
+}
+
 /* Контейнер - упрощено */
 .container {
     max-width: 100%;
@@ -854,6 +860,14 @@ td {
         margin-bottom: 20px;
         display: block;
         visibility: visible;
+        min-height: 100%;
+    }
+    
+    /* Убираем внутренний скролл в личном кабинете - скроллится вся страница */
+    #personalView .table-container {
+        max-height: none;
+        overflow-y: visible;
+        overflow-x: auto;
     }
     
     /* Кнопка выхода - всегда видимая и кликабельная */
@@ -863,6 +877,42 @@ td {
         pointer-events: auto;
         position: relative;
         z-index: 1000;
+    }
+    
+    /* Компактный личный кабинет на мобильных с отступом снизу для футера */
+    #personalView {
+        padding: 10px 10px 80px;
+    }
+    
+    #personalView > .table-container {
+        padding: 10px;
+    }
+    
+    .stat-card {
+        padding: 8px 10px;
+        min-width: 70px;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+    
+    #personalName {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+    
+    #personalStats {
+        margin: 15px 0;
+        min-height: 100%;
+    }
+    
+    .progress-container {
+        margin: 15px auto;
     }
 }
 
@@ -1027,6 +1077,36 @@ td {
     body.logged-in .footer {
         position: relative;
     }
+    
+    /* Шапка в личных кабинетах - скроллится с контентом */
+    body.logged-in .header {
+        position: relative;
+    }
+    
+    /* Шапка и футер в личном кабинете клиента/рефера - скроллятся с контентом */
+    body.logged-in:not(.admin-mode) .header,
+    body.logged-in:not(.admin-mode) .footer {
+        position: relative;
+    }
+    
+    /* Контейнер в личном кабинете клиента/рефера - полная высота */
+    body.logged-in:not(.admin-mode) .container {
+        min-height: auto;
+        display: block;
+    }
+    
+    /* body в личном кабинете клиента/рефера - обычный поток */
+    body.logged-in:not(.admin-mode) {
+        display: block;
+        height: auto;
+        overflow: visible;
+    }
+    
+    /* Личный кабинет - нет отдельного скролла */
+    #personalView {
+        overflow: visible;
+        height: auto;
+    }
 
     .auth-title {
         font-size: 1.3rem;
@@ -1166,7 +1246,29 @@ td {
         font-size: 1rem;
     }
 
+    #personalView {
+        padding: 8px 8px 80px;
+    }
+
+    .stat-card {
+        padding: 6px 8px;
+        min-width: 60px;
+    }
+
     .stat-value {
+        font-size: 0.9rem;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+    }
+
+    #personalName {
         font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .progress-container {
+        margin: 10px auto;
     }
 }

@@ -344,6 +344,9 @@ function enterUserMode(user) {
     // Прокрутка наверх
     window.scrollTo(0, 0);
     
+    // Добавляем класс для CSS
+    document.body.classList.add('logged-in');
+    
     authSection.classList.add('hidden');
     modeIndicator.className = 'mode-indicator view-mode';
     
